@@ -344,7 +344,7 @@ function convQ(from,to,q){const g=GROUPS[groupOf(from)];if(!g)return q;const a=F
    De viernes a domingo la cena siempre es pescado: así salen al menos 3 raciones a la semana. */
 const OPTS={
  desayuno:[
-  {id:'avena',how:'Avena con leche 2 min al microondas; añade el whey y el plátano en rodajas.',n:'Avena con leche, whey y plátano',i:[['avena',2,'c'],['leche',1,'x'],['whey',1,'x'],['platano',1,'x']]},
+  {id:'avena',how:'Avena con leche 2 min al microondas; mézclala con el queso batido y el plátano en rodajas.',n:'Avena con leche, queso batido y plátano',i:[['avena',2,'c'],['leche',1,'x'],['batido',1,'x'],['platano',1,'x']]},
   {id:'tostadas',how:'Tostadas con tomate rallado de bote y aceite; huevos a la plancha o ya cocidos.',n:'Tostadas con tomate, huevos y un vaso de leche',i:[['pan',1.5,'c'],['huevo',2,'x'],['aceite',.5,'f'],['leche',1,'x'],['fruta',1,'x']]},
   {id:'tortitas',how:'Tortitas con crema de cacahuete y plátano; el queso batido en un bol. Sin cocinar.',n:'Tortitas con crema de cacahuete y queso batido',i:[['tortitas',4,'c'],['cacahuete',1,'f'],['batido',1,'x'],['platano',1,'x']]},
   {id:'skyrdes',how:'Todo en un bol. Sin cocinar.',n:'Skyr con avena, fruta y frutos secos',i:[['skyr',1,'x'],['avena',1.5,'c'],['nueces',.5,'f'],['fruta',1,'x'],['leche',1,'x']]},
@@ -365,11 +365,11 @@ const OPTS={
  merienda:[
   {id:'batido',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con nueces y fruta',i:[['batido',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
   {id:'bocata',how:'Pollo del tupper en pan con tomate. Sin cocinar.',n:'Bocadillo de pollo con tomate',i:[['pan',1.5,'c'],['pollo',1,'x'],['fruta',1,'x'],['aceite',.5,'f']]},
-  {id:'whey',how:'Batidora o coctelera 30 segundos.',n:'Batido de whey con leche, plátano y frutos secos',i:[['whey',1,'x'],['leche',1,'x'],['platano',1,'x'],['nueces',1,'f']]},
+  {id:'huevospan',how:'Huevos cocidos ya pelados, pan y fruta. Sin cocinar.',n:'Huevos cocidos con pan, fruta y nueces',i:[['huevo',3,'x'],['pan',1,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
   {id:'skyrmer',how:'Todo en un bol. Sin cocinar.',n:'Skyr con cereales y fruta',i:[['skyr',1,'x'],['cereales',1,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
   {id:'sardinas',how:'Tostadas con tomate y sardinas de lata. Sin cocinar.',n:'Tostadas con sardinas y tomate',i:[['pan',1.5,'c'],['sardinas',1,'x'],['fruta',1,'x'],['ensalada',.5,'x']]},
-  {id:'yogurfruta',how:'Sin cocinar.',n:'Yogures con fruta y nueces',i:[['yogur',2,'x'],['fruta',1,'x'],['nueces',1,'f'],['whey',.5,'x']]},
-  {id:'lechecereal',how:'Sin cocinar.',n:'Leche con cereales, plátano y whey',i:[['leche',1,'x'],['cereales',1,'c'],['platano',1,'x'],['whey',.5,'x']]}],
+  {id:'yogurfruta',how:'Sin cocinar.',n:'Skyr y yogur con fruta y nueces',i:[['skyr',1,'x'],['yogur',1,'x'],['fruta',1,'x'],['nueces',1,'f']]},
+  {id:'lechecereal',how:'Sin cocinar.',n:'Leche con cereales, plátano y un skyr',i:[['leche',1,'x'],['cereales',1,'c'],['platano',1,'x'],['skyr',1,'x']]}],
  recena:[
   {id:'batidocasero',how:'Batidora 30 segundos.',n:'Batido casero de leche, avena, plátano y crema de cacahuete',i:[['leche',1,'x'],['avena',1,'c'],['platano',1,'x'],['cacahuete',1,'f']]},
   {id:'skyrnoche',how:'Sin cocinar.',n:'Skyr con nueces y fruta',i:[['skyr',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
@@ -1214,8 +1214,8 @@ function wheyInfo(k=ui.cur){
 function wheyCard(k=ui.cur){
   const x=wheyInfo(k);let body,act='';
   if(x.mode==='plan'){
-    body=x.w?`Hoy el menú lleva <b>${fq(x.w)} cacito${x.w>1?'s':''}</b> (en ${x.where.join(' y ')}). Tómala solo si comes ese plato tal cual. Si lo cambias por otra cosa, mira esta tarjeta después de cenar.`
-      :`Hoy el menú <b>no la necesita</b>: llegas a tu proteína con comida.`;
+    body=x.w?`Hoy el menú lleva <b>${fq(x.w)} cacito${x.w>1?'s':''}</b> (en ${x.where.join(' y ')}).`
+      :`<b>No hace falta:</b> el menú de hoy llega a tu proteína solo con comida. Si un día comes distinto, apúntalo y mira esta tarjeta después de cenar.`;
   }else if(x.gap<20){
     body=`Llevas <b>${nf(x.P)} de ${x.tg} g</b> de proteína. <b>No la necesitas</b>${x.gap>0?': te faltan menos de 20 g y no importa':''}.`;
   }else if(!x.late){
@@ -1232,7 +1232,7 @@ function wheyCard(k=ui.cur){
       <li>La proteína en polvo solo sirve para <b>llegar a tu proteína del día</b> cuando la comida no llega. No da más músculo que la comida.</li>
       <li>Si te faltan <b>20 g o más</b> al final del día: 1 cacito por cada ~24 g que falten. Menos de 20 g: no hace falta.</li>
       <li>Máximo <b>2 cacitos al día</b>. La hora da igual; después de entrenar o antes de dormir son cómodos.</li>
-      <li>Si el menú la incluye (desayuno o merienda), cuenta como parte del menú: tómala.</li>
+      <li>Mejor llegar con comida: tus menús ya lo hacen sin proteína en polvo. Úsala solo de recambio, los días que comas poco o fuera.</li>
     </ul></details>
   </section>`;
 }
