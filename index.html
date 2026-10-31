@@ -1008,6 +1008,7 @@ function vHoy(){
         :`<p class="small muted" style="margin:0">Hoy toca ${esc(menuTpl(ui.cur).names.comida.n.toLowerCase())} y de cena ${esc(menuTpl(ui.cur).names.cena.n.toLowerCase())}. Un toque y está apuntado.</p>
         <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>`}
     </section>
+    ${wheyCard()}
     ${session}
     ${fifthSuggested()?`<section class="card stack"><h3>Toca subir a ${(state.settings.days||4)+1} días</h3><p class="small muted" style="margin:0">Llevas más de 6 meses y te has estancado en ${stalledCount()} ejercicios. Un día más de entreno a la semana es lo que más te va a hacer avanzar ahora.</p><div class="grid2"><button class="btn primary" data-a="fifth-on">Activar</button><button class="btn" data-a="fifth-no">Ahora no</button></div></section>`:''}
     ${checksDue().length?`<section class="card stack"><h3>Pendiente</h3>${checksDue().map(([k,n,,d])=>`<div class="spread" style="padding:6px 0;border-top:1px solid var(--line)"><span style="min-width:0">${esc(n)}<br><span class="small muted">${esc(d)}</span></span><button class="btn sm" data-a="check" data-v="${k}">Hecho</button></div>`).join('')}</section>`:''}
@@ -1200,10 +1201,45 @@ function limitsCard(){
     <p class="small muted" style="margin:8px 0 0">Las raciones de pescado y los topes de mercurio, carne y arroz siguen a la AESAN, la EFSA y el World Cancer Research Fund.</p></details>
   </section>`;
 }
+/* ¿Proteína en polvo hoy? Regla única: solo para tapar el hueco de proteína que deja la comida. */
+function wheyInfo(k=ui.cur){
+  const tg=targets().P,d=peek(k),lg=(d&&d.foods||[]).filter(e=>e.f||e.c);
+  const wq=list=>list.filter(e=>e.f==='whey').reduce((a,e)=>a+e.q,0);
+  if(!lg.length){const m=buildMenu(menuTpl(k));const w=wq(m);const where=[...new Set(m.filter(e=>e.f==='whey').map(e=>(MEALS.find(x=>x[0]===e.m)||[,e.m])[1].toLowerCase()))];
+    return{mode:'plan',tg,w,where}}
+  const P=totals(k).P,gap=tg-P,w=wq(lg),late=k<TODAY||new Date().getHours()>=20;
+  const n=Math.min(2-Math.min(2,w),Math.max(.5,Math.round(gap/24*2)/2));
+  return{mode:'log',tg,P,gap,w,late,n};
+}
+function wheyCard(k=ui.cur){
+  const x=wheyInfo(k);let body,act='';
+  if(x.mode==='plan'){
+    body=x.w?`Hoy el menú lleva <b>${fq(x.w)} cacito${x.w>1?'s':''}</b> (en ${x.where.join(' y ')}). Tómala solo si comes ese plato tal cual. Si lo cambias por otra cosa, mira esta tarjeta después de cenar.`
+      :`Hoy el menú <b>no la necesita</b>: llegas a tu proteína con comida.`;
+  }else if(x.gap<20){
+    body=`Llevas <b>${nf(x.P)} de ${x.tg} g</b> de proteína. <b>No la necesitas</b>${x.gap>0?': te faltan menos de 20 g y no importa':''}.`;
+  }else if(!x.late){
+    body=`Llevas <b>${nf(x.P)} de ${x.tg} g</b>. Aún te quedan comidas: mira esto después de cenar. Si al final te faltan 20 g o más, la app te dirá cuánta tomar.`;
+  }else if(x.n<=0){
+    body=`Te faltan ${nf(x.gap)} g, pero ya llevas 2 cacitos hoy, el máximo. Mañana mete más proteína en las comidas.`;
+  }else{
+    body=`Te faltan <b>${nf(x.gap)} g</b> de proteína. Toma <b>${fq(x.n)} cacito${x.n>1?'s':''}</b> (${nf(x.n*24)} g) con agua o leche. Vale antes de dormir.`;
+    act=`<button class="btn primary block" data-a="whey-add" data-v="${x.n}">Apuntar ${fq(x.n)} cacito${x.n>1?'s':''}</button>`;
+  }
+  return `<section class="card stack"><div class="spread"><h3>¿Proteína en polvo hoy?</h3><span class="chip ${act?'warnchip':''}">${act?'Sí':'No hace falta'}</span></div>
+    <p class="small" style="margin:0">${body}</p>${act}
+    <details><summary class="small">La regla</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
+      <li>La proteína en polvo solo sirve para <b>llegar a tu proteína del día</b> cuando la comida no llega. No da más músculo que la comida.</li>
+      <li>Si te faltan <b>20 g o más</b> al final del día: 1 cacito por cada ~24 g que falten. Menos de 20 g: no hace falta.</li>
+      <li>Máximo <b>2 cacitos al día</b>. La hora da igual; después de entrenar o antes de dormir son cómodos.</li>
+      <li>Si el menú la incluye (desayuno o merienda), cuenta como parte del menú: tómala.</li>
+    </ul></details>
+  </section>`;
+}
 function suppCard(){
   return `<section class="card"><details><summary>Suplementos: solo los que sirven</summary><div class="small" style="display:grid;gap:8px;margin-top:10px">
     <p style="margin:0"><b>1. Creatina monohidrato: 5 g al día, todos los días.</b> Es el suplemento con más pruebas para fuerza y músculo. Da igual la hora. Con 3-5 g basta: más no da más resultado y puede sentar mal al estómago.</p>
-    <p style="margin:0"><b>2. Proteína whey:</b> no es obligatoria. Úsala solo cuando no llegues a tu proteína con comida. 1-2 cacitos.</p>
+    <p style="margin:0"><b>2. Proteína whey:</b> solo para tapar el hueco. La tarjeta «¿Proteína en polvo hoy?» de Hoy te dice cada día si toca y cuántos cacitos. Máximo 2.</p>
     <p style="margin:0"><b>3. Vitamina D:</b> solo si te sale baja en la analítica, o en invierno si te lo recomienda el médico. La dosis te la dice él.</p>
     <p style="margin:0"><b>4. Omega-3 en cápsulas:</b> solo si dejas de comer salmón o sardinas. Tu menú ya lo cubre.</p>
     <p style="margin:0"><b>5. Cafeína:</b> opcional. Un café 30-60 min antes de entrenar mejora el rendimiento, nunca por la tarde.</p>
@@ -1804,6 +1840,7 @@ document.addEventListener('click',e=>{
     case'import':$('#io').hidden=false;$('#io').value='';$('#io-ok').hidden=false;$('#io').focus();break;
     case'import-ok':{try{importData($('#io').value)}catch(_){el.textContent='Texto no válido'}break}
     case'backup':doBackup(el);break;
+    case'whey-add':d().foods.push({id:uid(),f:'whey',q:+v,m:'extra'});saveDay();ui.toast='Apuntado. Ya llegas a tu proteína.';render();break;
     case'onb-next':onbNext();render();window.scrollTo(0,0);break;
     case'onb-back':{const o=onbData();o.err='';o.step=Math.max(0,o.step-1);render();break}
     case'onb-set':{const o=onbData();o.d[el.dataset.k]=el.dataset.n?+v:v;if(el.dataset.k==='sex'){o.d.bf=null;o.d.focus=null;o.d.body=''}render();break}
