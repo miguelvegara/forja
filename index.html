@@ -989,11 +989,11 @@ function weeklyCard(){
     <div style="margin-top:8px"><button class="btn primary sm" data-a="apply-adj" data-v="${sug.delta}">Aplicar ${sug.delta>0?'+':''}${sug.delta} kcal</button></div></div>`;
   else if(sug&&!sug.delta)body+=`<div class="callout ok small">Tu peso va al ritmo correcto. No cambies la dieta esta semana.</div>`;
   if(due)body+=`<div class="stack" style="gap:8px"><div class="small"><b>Toca medirte</b> <span class="muted">(una vez por semana, en ayunas)</span></div>
-    <div class="grid3">
+    <div class="${isF()?'grid3':'grid2'}">
       <div class="field"><label for="wa">Cintura</label><input class="inp" id="wa" inputmode="decimal" data-f="waist" value="${ival(d.waist)}" placeholder="cm"></div>
       <div class="field"><label for="ne">Cuello</label><input class="inp" id="ne" inputmode="decimal" data-f="neck" value="${ival(d.neck)}" placeholder="cm"></div>
-      ${isF()?`<div class="field"><label for="hp">Cadera</label><input class="inp" id="hp" inputmode="decimal" data-f="hip" value="${ival(d.hip)}" placeholder="cm"></div>`:`<div class="field"><label for="sh">Hombros</label><input class="inp" id="sh" inputmode="decimal" data-f="shoulders" value="${ival(d.shoulders)}" placeholder="cm"></div>`}
-    </div><p class="small muted" style="margin:0">Cintura a la altura del ombligo sin meter tripa. Cuello justo bajo la nuez. ${isF()?'Cadera: por la parte más ancha del glúteo.':'Hombros: contorno por la parte más ancha, brazos relajados.'}</p></div>`;
+      ${isF()?`<div class="field"><label for="hp">Cadera</label><input class="inp" id="hp" inputmode="decimal" data-f="hip" value="${ival(d.hip)}" placeholder="cm"></div>`:''}
+    </div><p class="small muted" style="margin:0">Solo esto para tu % de grasa. Cintura a la altura del ombligo sin meter tripa. Cuello justo bajo la nuez.${isF()?' Cadera: por la parte más ancha del glúteo.':''}</p></div>`;
   return `<section class="card stack">${body}</section>`;
 }
 
