@@ -742,7 +742,24 @@ function curBf(){const lm=lastMeasure();if(lm&&lm.bf&&lm.k>add(TODAY,-120))retur
 function bodyFat(waist,neck,h,hip){if(!waist||!neck)return null;
   if(isF()){if(!hip||waist+hip<=neck)return null;return 495/(1.29579-0.35004*Math.log10(waist+hip-neck)+0.22100*Math.log10(h))-450}
   if(waist<=neck)return null;return 495/(1.0324-0.19077*Math.log10(waist-neck)+0.15456*Math.log10(h))-450}
-function measures(){return Object.keys(state.days).sort().filter(k=>{const d=state.days[k];return d&&d.waist&&d.neck&&(!isF()||d.hip)}).map(k=>{const d=state.days[k];return{k,waist:d.waist,neck:d.neck,hip:d.hip||null,sh:d.shoulders||null,bf:bodyFat(d.waist,d.neck,state.settings.h,d.hip)}})}
+/* % de grasa lo más exacto posible en casa:
+   1) Cinta (fórmula de la Marina de EE. UU., ±3-4 %)  2) RFM (relación altura/cintura, validada con DEXA, ±3-4 %)
+   3) Plicómetro de 3 pliegues (Jackson-Pollock, ±3 %, el más preciso en casa)
+   Se combinan (los errores se compensan), se suavizan con las medidas de las últimas 2 semanas
+   y, si tienes una DEXA o un estudio de clínica, se calibran con él. */
+function rfm(sex,h,waist){if(!waist)return null;return (sex==='f'?76:64)-20*(h/waist)}
+function jp3(sex,age,s){if(!(s>0))return null;const bd=sex==='f'?1.0994921-0.0009929*s+0.0000023*s*s-0.0001392*age:1.10938-0.0008267*s+0.0000016*s*s-0.0002574*age;return 495/bd-450}
+function bfParts(d){const s=state.settings,sx=s.sex==='f'?'f':'m';const parts=[];
+  const nv=d.waist&&d.neck?bfFormula(sx,d.waist,d.neck,s.h,d.hip):null;if(nv>2&&nv<65)parts.push(['Cinta (Marina)',nv,1]);
+  const rf=rfm(sx,s.h,d.waist);if(rf>2&&rf<65)parts.push(['Altura/cintura (RFM)',rf,1]);
+  const sk=(d.sk1&&d.sk2&&d.sk3)?d.sk1+d.sk2+d.sk3:null;const jp=sk?jp3(sx,ageNow(),sk):null;if(jp>2&&jp<65)parts.push(['Plicómetro',jp,2.5]);
+  if(!parts.length)return null;const wsum=parts.reduce((a,p)=>a+p[2],0);const raw=parts.reduce((a,p)=>a+p[1]*p[2],0)/wsum;
+  const cal=s.bfCal&&s.bfCal.off!=null?s.bfCal.off:0;
+  return{parts,raw,bf:raw+cal,err:cal?1.5:jp?2.5:parts.length>1?3:4,cal:!!cal}}
+function measures(){const out=Object.keys(state.days).sort().map(k=>{const d=state.days[k];if(!d||!d.waist)return null;const b=bfParts(d);if(!b)return null;
+    return{k,waist:d.waist,neck:d.neck||null,hip:d.hip||null,sh:d.shoulders||null,one:b.bf,raw:b.raw,parts:b.parts,err:b.err,cal:b.cal}}).filter(Boolean);
+  out.forEach((m,i)=>{const win=out.slice(0,i+1).filter(x=>x.k>add(m.k,-14));m.bf=win.reduce((a,x)=>a+x.one,0)/win.length;m.n=win.length;m.err=Math.max(1,m.err/Math.sqrt(win.length))});
+  return out}
 function lastMeasure(){const m=measures();return m.length?m[m.length-1]:null}
 function lastShoulders(){const ks=Object.keys(state.days).sort().filter(k=>state.days[k]&&state.days[k].shoulders);return ks.length?state.days[ks[ks.length-1]].shoulders:null}
 function ageNow(){const s=state.settings;return (s.age||22)+Math.max(0,Math.floor((pk(TODAY)-pk(s.ageAt||'2026-10-28'))/(365.25*864e5)))}
@@ -1384,8 +1401,12 @@ function vProgreso(){
   if(lm&&lm.bf){
     const ffm=w*(1-lm.bf/100),ffmi=ffm/(hm*hm)+6.1*(1.8-hm);
     const fm=isF()?18.5:23,t=bfT();const goalW=(fm+6.1*(hm-1.8))*hm*hm/(1-t/100);
-    comp=`<div class="kpis"><div class="kpi"><b class="num">${nf(lm.bf,1)} %</b><span>grasa estimada</span></div><div class="kpi"><b class="num">${nf(ffm,1)}</b><span>kg de masa magra</span></div><div class="kpi"><b class="num">${nf(ffmi,1)}</b><span>FFMI (meta ${nf(fm,1)})</span></div></div>
-      <div class="small muted">Con un FFMI de ${nf(fm,1)} y un ${t} % de grasa pesarías unos <b style="color:var(--ink)">${nf(goalW,0)} kg</b>. ${ffmi<fm?`Te quedan unos ${nf(Math.max(0,(fm-ffmi)*hm*hm),0)} kg de músculo.`:'Ya estás ahí: toca mantener.'}</div>`;
+    comp=`<div class="kpis"><div class="kpi"><b class="num">${nf(lm.bf,1)} %</b><span>grasa · ±${nf(lm.err,1)}</span></div><div class="kpi"><b class="num">${nf(ffm,1)}</b><span>kg de masa magra</span></div><div class="kpi"><b class="num">${nf(ffmi,1)}</b><span>FFMI (meta ${nf(fm,1)})</span></div></div>
+      <div class="small muted">Con un FFMI de ${nf(fm,1)} y un ${t} % de grasa pesarías unos <b style="color:var(--ink)">${nf(goalW,0)} kg</b>. ${ffmi<fm?`Te quedan unos ${nf(Math.max(0,(fm-ffmi)*hm*hm),0)} kg de músculo.`:'Ya estás ahí: toca mantener.'}</div>
+      <details><summary class="small">De dónde sale tu ${nf(lm.bf,1)} %</summary><div class="small" style="display:grid;gap:4px;margin-top:6px">
+        ${lm.parts.map(([n,v])=>`<div class="spread"><span class="muted">${n}</span><b class="num">${nf(v,1)} %</b></div>`).join('')}
+        <div class="spread"><span class="muted">Combinado${lm.n>1?` y media de ${lm.n} medidas (2 semanas)`:''}${lm.cal?' y calibrado':''}</span><b class="num">${nf(lm.bf,1)} %</b></div>
+        <p class="muted" style="margin:4px 0 0">Margen de error aproximado: ±${nf(lm.err,1)} %. Lo que más lo reduce: el plicómetro, medirte cada semana igual y calibrar una vez con una DEXA.</p></div></details>`;
   }else comp=`<div class="callout">Mídete cintura y cuello (abajo o en Hoy) para estimar tu % de grasa y decidir la fase.</div>`;
   let ad='';
   if(isF()){
@@ -1415,7 +1436,24 @@ function vProgreso(){
         <div class="field"><label for="ne2">Cuello</label><input class="inp" id="ne2" inputmode="decimal" data-f="neck" value="${ival(d.neck)}" placeholder="cm"></div>
         ${isF()?`<div class="field"><label for="hp2">Cadera</label><input class="inp" id="hp2" inputmode="decimal" data-f="hip" value="${ival(d.hip)}" placeholder="cm"></div>`:`<div class="field"><label for="sh2">Hombros</label><input class="inp" id="sh2" inputmode="decimal" data-f="shoulders" value="${ival(d.shoulders)}" placeholder="cm"></div>`}
       </div>
-      <p class="small muted" style="margin:0">Una vez por semana, en ayunas. El % de grasa por cinta tiene un error de ±3 %, pero la tendencia es fiable.</p></section>
+      <details${d.sk1||d.sk2||d.sk3?' open':''}><summary class="small">Con plicómetro: más exacto (opcional)</summary><div class="stack" style="gap:8px;margin-top:8px">
+        <div class="grid3">${(isF()?[['sk1','Tríceps'],['sk2','Suprailíaco'],['sk3','Muslo']]:[['sk1','Pecho'],['sk2','Abdomen'],['sk3','Muslo']]).map(([k,l])=>`<div class="field"><label for="${k}">${l}</label><input class="inp" id="${k}" inputmode="decimal" data-f="${k}" value="${ival(d[k])}" placeholder="mm"></div>`).join('')}</div>
+        <p class="small muted" style="margin:0">Un plicómetro cuesta unos 10 € (Amazon o Decathlon). Siempre en el lado derecho, de pie y relajado. Pellizca la piel y la grasa con dos dedos, separándola del músculo, pon el plicómetro 1 cm al lado y lee a los 2 segundos. Mide cada pliegue 2 veces y pon la media.
+        ${isF()?'Tríceps: vertical, detrás del brazo, a mitad entre hombro y codo. Suprailíaco: diagonal, justo encima del hueso de la cadera. Muslo: vertical, delante, a mitad entre ingle y rodilla.':'Pecho: diagonal, a mitad entre la axila y el pezón. Abdomen: vertical, 2 cm a la derecha del ombligo. Muslo: vertical, delante, a mitad entre ingle y rodilla.'}</p></div></details>
+      <details><summary class="small">Cómo medirte para que salga exacto</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
+        <li>Siempre igual: el mismo día de la semana, en ayunas, después de ir al baño y antes de beber o entrenar.</li>
+        <li>De pie, relajado, sin meter tripa, respirando normal: mide al final de soltar el aire.</li>
+        <li>Cinta flexible, recta y pegada a la piel, sin apretar. Frente a un espejo para verla horizontal.</li>
+        <li><b>Cintura:</b> justo a la altura del ombligo. <b>Cuello:</b> justo debajo de la nuez, con la cinta un poco inclinada hacia delante.${isF()?' <b>Cadera:</b> por la parte más ancha del glúteo.':''}</li>
+        <li>Mide cada cosa 2 veces; si difieren más de 0,5 cm, una tercera. Pon la media.</li>
+        <li>Mejor que te mida otra persona, siempre la misma.</li>
+      </ul></details>
+      <p class="small muted" style="margin:0">La app combina varios métodos y hace la media de tus medidas de las últimas 2 semanas: así el error baja y la tendencia es muy fiable.</p></section>
+    <section class="card stack"><h3>Calibrar con DEXA (opcional)</h3>
+      <p class="small muted" style="margin:0">Una DEXA (densitometría corporal, unos 50-80 € en clínicas) es lo más exacto. Hazte una una vez, apunta tu medida de cinta ese mismo día y pon aquí el resultado: la app corregirá todas tus estimaciones a partir de ahí.</p>
+      ${s.bfCal?`<div class="callout ok small">Calibrado el ${pk(s.bfCal.at).toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})} con DEXA ${nf(s.bfCal.dexa,1)} % (corrección ${s.bfCal.off>=0?'+':''}${nf(s.bfCal.off,1)} %). <button class="btn ghost sm" data-a="cal-del">Quitar</button></div>`:''}
+      <div class="grid2"><div class="field"><label for="cal-in">% de grasa de la DEXA</label><input class="inp" id="cal-in" inputmode="decimal" placeholder="p. ej. 17,4"></div><button class="btn" style="align-self:end" data-a="cal-set">Calibrar</button></div>
+    </section>
     ${lifts?`<section class="card stack"><h3>Fuerza (1RM estimado, kg)</h3><div style="overflow-x:auto"><table class="t"><thead><tr><th>Ejercicio</th><th class="r">Inicio</th><th class="r">Ahora</th><th class="r">Cambio</th></tr></thead><tbody>${lifts}</tbody></table></div></section>`:''}
   </div>`;
 }
@@ -1574,7 +1612,7 @@ function checksDue(){const c=state.settings.checks||{};return CHECKS.filter(([k,
 function compactDay(k){
   const d=state.days[k];if(!d||d.c||k>add(TODAY,-120)||!hasContent(d))return false;
   const n={c:1};
-  ['weight','waist','neck','shoulders','steps','bed','wake','sleep','crea','walk','type','hab'].forEach(f=>{if(d[f]!=null&&d[f]!==false)n[f]=d[f]});
+  ['weight','waist','neck','shoulders','hip','sk1','sk2','sk3','steps','bed','wake','sleep','crea','walk','type','hab'].forEach(f=>{if(d[f]!=null&&d[f]!==false)n[f]=d[f]});
   if((d.foods||[]).length){const t=totals(k);n.kcal=Math.round(t.k);n.prot=Math.round(t.P)}
   const sets={};for(const hk in (d.sets||{})){const ok=(d.sets[hk]||[]).filter(x=>x&&x.done&&x.reps);if(ok.length){const b=ok.reduce((a,x)=>e1rm(x.kg||0,x.reps)>e1rm(a.kg||0,a.reps)?x:a);sets[hk]=[{kg:b.kg,reps:b.reps,done:true}]}}
   if(Object.keys(sets).length)n.sets=sets;
@@ -1840,6 +1878,11 @@ document.addEventListener('click',e=>{
     case'import':$('#io').hidden=false;$('#io').value='';$('#io-ok').hidden=false;$('#io').focus();break;
     case'import-ok':{try{importData($('#io').value)}catch(_){el.textContent='Texto no válido'}break}
     case'backup':doBackup(el);break;
+    case'cal-set':{const v=parseNum($('#cal-in').value);const ms=measures();const m=ms.filter(x=>x.k>add(TODAY,-14)).pop();
+      if(!(v>2&&v<65)){ui.toast='Pon el % de la DEXA, por ejemplo 17,4.';render();break}
+      if(!m){ui.toast='Antes mide tu cintura y cuello (hoy o en los últimos 14 días) para poder calibrar.';render();break}
+      state.settings.bfCal={off:+(v-m.raw).toFixed(2),dexa:v,at:TODAY};saveSettings();autoPhase();ui.toast='Calibrado. Tus estimaciones ya usan tu DEXA.';render();break}
+    case'cal-del':delete state.settings.bfCal;saveSettings();render();break;
     case'whey-add':d().foods.push({id:uid(),f:'whey',q:+v,m:'extra'});saveDay();ui.toast='Apuntado. Ya llegas a tu proteína.';render();break;
     case'onb-next':onbNext();render();window.scrollTo(0,0);break;
     case'onb-back':{const o=onbData();o.err='';o.step=Math.max(0,o.step-1);render();break}
@@ -1867,7 +1910,7 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
   const el=e.target;
-  if(el.dataset.f){needRender=true;if(['waist','neck','hip'].includes(el.dataset.f))autoPhase();return}
+  if(el.dataset.f){needRender=true;if(['waist','neck','hip','sk1','sk2','sk3'].includes(el.dataset.f))autoPhase();return}
   if(el.dataset.t){const dd=day();if(el.value)dd[el.dataset.t]=el.value;else delete dd[el.dataset.t];saveDay();needRender=true;return}
   if(el.dataset.sn){state.settings[el.dataset.sn]=el.value.trim();saveSettings();needRender=true;return}
   if(el.dataset.s){const val=parseNum(el.value);if(val!=null){state.settings[el.dataset.s]=val;if(el.dataset.s==='age')state.settings.ageAt=TODAY;saveSettings();needRender=true}return}
