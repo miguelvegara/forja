@@ -334,6 +334,11 @@ const GROUPS={
  fruta:{n:'Fruta',key:'C',f:['platano','fruta']},
  veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','judias','salteado','espinacas','verdura']}
 };
+/* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
+const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'salmon',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
+ arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'quinoa',quinoa:'arroz',pan:'avena',avena:'pan',tortitas:'pan',cereales:'avena',
+ aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'skyr',yogur:'skyr',
+ fruta:'platano',platano:'fruta',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
 function groupOf(f){for(const g in GROUPS)if(GROUPS[g].f.includes(f))return g;return null}
 function subOf(f){const s=(state.settings.subs||{})[f];return s&&F[s]&&groupOf(s)===groupOf(f)?s:null}
 function convQ(from,to,q){const g=GROUPS[groupOf(from)];if(!g)return q;const a=F[from][g.key],b=F[to][g.key];return b>0?q*a/b:q}
@@ -1127,19 +1132,22 @@ function vComida(){
         <div class="q">${e.c?fq(e.q)+' ración':esc(qtyText(f,e.q))} · <span class="num">${nf(mm.k)} kcal</span></div></div>`}).join('')}
       <button class="btn ghost sm" data-a="add" data-v="${m}">+ Añadir a ${l.toLowerCase()}</button></section>`;
   }).join('');
-  const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>`<div style="margin-top:8px"><div class="spread"><span class="eyebrow">${l}</span><span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span></div><div class="spread small"><span style="font-weight:600">${esc(tp.names[m].n)}</span><span class="muted num" style="white-space:nowrap">${nf(menu.filter(i=>i.m===m).reduce((a,i)=>a+F[i.f].P*i.q,0))} g prot</span></div>${tp.names[m].how?`<div class="small muted" style="margin:2px 0 4px">${esc(tp.names[m].how)}</div>`:''}${menu.filter(i=>i.m===m).map(i=>`<div class="spread small" style="padding:3px 0"><span>${groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span style="text-align:right;white-space:nowrap">${qtyG(F[i.f],i.q)?`<b class="num">${esc(qtyG(F[i.f],i.q))}</b><br><span class="muted">o ${esc(qtyHand(F[i.f],i.q))}</span>`:`<b>${esc(qtyHand(F[i.f],i.q))}</b>`}</span></div>`).join('')}</div>`).join('');
+  const fixed=state.settings.menuFixed!==false;
+  const eqRow=i=>{const e=EQ[i.f];if(!e||!F[e])return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
+    return `<div class="small muted" style="padding:0 0 4px 12px">o ${esc(F[e].n.toLowerCase())}: ${esc(qtyG(F[e],q)||qtyHand(F[e],q))}${qtyG(F[e],q)?' · '+esc(qtyHand(F[e],q)):''}</div>`};
+  const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>`<div style="margin-top:10px"><div class="spread"><span class="eyebrow">${l}</span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div><div class="spread small"><span style="font-weight:600">${esc(tp.names[m].n)}</span><span class="muted num" style="white-space:nowrap">${nf(menu.filter(i=>i.m===m).reduce((a,i)=>a+F[i.f].P*i.q,0))} g prot</span></div>${tp.names[m].how?`<div class="small muted" style="margin:2px 0 4px">${esc(tp.names[m].how)}</div>`:''}${menu.filter(i=>i.m===m).map(i=>`<div class="spread small" style="padding:3px 0 1px"><span>${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span style="text-align:right;white-space:nowrap">${qtyG(F[i.f],i.q)?`<b class="num">${esc(qtyG(F[i.f],i.q))}</b><br><span class="muted">o ${esc(qtyHand(F[i.f],i.q))}</span>`:`<b>${esc(qtyHand(F[i.f],i.q))}</b>`}</span></div>${eqRow(i)}`).join('')}</div>`).join('');
   return header()+`<div class="stack">
     ${kcalCard()}
     <section class="card stack">
       <div class="spread"><h2>Menú de hoy</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
-      <p class="small muted" style="margin:0">${mealPlan().length} comidas al día en ${PHASES[state.settings.mode].n.toLowerCase()}${state.settings.mode==='cut'?' (menos comidas y más grandes: sacian más)':state.settings.mode==='bulk'?' (más comidas: es más fácil comer más)':''}. La comida y la cena se repiten de lunes a jueves y de viernes a domingo para que cocines solo 2 veces (domingo y jueves). El desayuno y la merienda cambian cada semana. Cada tanda trae platos nuevos. Cuadrado a tu objetivo: <span class="num">${nf(mt.k)} kcal · ${nf(mt.P)} g de proteína</span>. A la derecha, el peso para la báscula y debajo la medida a ojo.</p>
+      <p class="small muted" style="margin:0">${mealPlan().length} comidas al día en ${PHASES[state.settings.mode].n.toLowerCase()}${state.settings.mode==='cut'?' (menos comidas y más grandes: sacian más)':state.settings.mode==='bulk'?' (más comidas: es más fácil comer más)':''}. La app decide y rota los platos sola. La comida y la cena se repiten de lunes a jueves y de viernes a domingo para que cocines solo 2 veces (domingo y jueves). Debajo de cada alimento tienes su equivalente por si no lo tienes. El desayuno y la merienda cambian cada semana. Cada tanda trae platos nuevos. Cuadrado a tu objetivo: <span class="num">${nf(mt.k)} kcal · ${nf(mt.P)} g de proteína</span>. A la derecha, el peso para la báscula y debajo la medida a ojo.</p>
       <div>${menuHtml}</div>
       <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>
       ${(state.settings.mex&&Object.values(state.settings.mex).some(a=>a.length))?`<button class="btn ghost sm" data-a="mex-reset">Volver a mostrar los platos quitados</button>`:''}
     </section>
     ${phaseCard()}
     ${limitsCard()}
-    ${subsCard()}
+    ${state.settings.menuFixed!==false?'':subsCard()}
     ${suppCard()}
     ${micCard(ui.cur)}
     ${prepCard()}
@@ -1518,6 +1526,9 @@ function vPlan(){
       <p style="margin:0"><b>Una mala semana de dieta:</b> no compenses pasando hambre. Vuelve al menú el lunes. Lo que cuenta es la media de meses, no de días.</p>
       <p style="margin:0"><b>Lo dejas meses:</b> vuelve con el 70 % de los pesos que usabas y sube cada semana. El músculo vuelve mucho más rápido que la primera vez.</p>
     </div></details></section>
+    <section class="card stack">
+      <div class="spread"><span>Menú fijo<div class="small muted">La app decide y va rotando los platos sola. Apágalo solo si quieres poder cambiar platos y alimentos a mano.</div></span><button class="toggle ${s.menuFixed!==false?'on':''}" data-a="menu-fixed" aria-pressed="${s.menuFixed!==false}" aria-label="Menú fijo"></button></div>
+    </section>
     <section class="card stack"><h3>Fase</h3>
       <div class="spread"><span>Fase automática<div class="small muted">Decide según tu % de grasa: define si pasas del ${bfT()+2} %, gana músculo si bajas del ${bfT()-1} % y mantiene cuando llegues a tu techo de músculo.</div></span><button class="toggle ${s.autoPhase?'on':''}" data-a="auto-phase" aria-pressed="${!!s.autoPhase}" aria-label="Fase automática"></button></div>
       ${s.autoPhase?`<div class="callout ok small">${esc(rec.why)}</div>`:''}
@@ -1977,6 +1988,7 @@ document.addEventListener('click',e=>{
     case'import':$('#io').hidden=false;$('#io').value='';$('#io-ok').hidden=false;$('#io').focus();break;
     case'import-ok':{try{importData($('#io').value)}catch(_){el.textContent='Texto no válido'}break}
     case'backup':doBackup(el);break;
+    case'menu-fixed':state.settings.menuFixed=state.settings.menuFixed===false;saveSettings();render();break;
     case'cal-set':{const v=parseNum($('#cal-in').value);const ms=measures();const m=ms.filter(x=>x.k>add(TODAY,-14)).pop();
       if(!(v>2&&v<65)){ui.toast='Pon el % de la DEXA, por ejemplo 17,4.';render();break}
       if(!m){ui.toast='Antes mide tu cintura y cuello (hoy o en los últimos 14 días) para poder calibrar.';render();break}
