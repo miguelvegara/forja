@@ -408,7 +408,7 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
   if(state.settings.mode==='cut'&&m.cena)m.cena=[...m.cena,['skyr',1,'x']];
   if(state.settings.mode==='cut'&&m.comida)m.comida=[...m.comida,['ensalada',1,'x'],['fruta',1,'x']];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
-  if((state.settings.shopDays||7)>=30){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
+  if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
     for(const ml in m)m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[alt,q,r]:f==='platano'?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r]);} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   return{m,names}}
 
@@ -1323,7 +1323,7 @@ function vShop(){
   return header()+`<div class="stack">
     <div class="row"><button class="btn sm" data-a="shop-close">${sicon('left')} Comida</button></div>
     <section class="stack"><h1>Lista de la compra</h1>
-      <p class="small muted" style="margin:0">Exactamente lo que comes en tus menús de los próximos ${days} días (con tus cambios y platos quitados). Cantidades en crudo; los envases son los habituales de Mercadona, comprueba el peso en la etiqueta.${days>=30?' En modo mes, los menús usan solo cosas que aguantan: verdura congelada y fruta de nevera.':''}</p>
+      <p class="small muted" style="margin:0">Exactamente lo que comes en tus menús de los próximos ${days} días (con tus cambios y platos quitados). Cantidades en crudo; los envases son los habituales de Mercadona, comprueba el peso en la etiqueta.${days>=14?' Comprando para 2 semanas o más, los menús usan solo cosas que aguantan: verdura congelada y fruta de nevera.':''} Haz tus cambios de platos antes de comprar.</p>
       <div class="seg">${[[7,'1 semana'],[14,'2 semanas'],[30,'1 mes']].map(([n,l])=>`<button data-a="shop-days" data-v="${n}" class="${days===n?'on':''}">${l}</button>`).join('')}</div>
       <div class="spread small"><span class="muted">${left?left+' por coger':'Todo en el carro'}</span><button class="btn ghost sm" data-a="shop-reset">Desmarcar todo</button></div>
     </section>
