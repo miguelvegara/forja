@@ -816,7 +816,7 @@ function exObj(a,k=ui.cur){
   return{key:a[0],hk:idx?a[0]+'~'+idx:a[0],n:idx?alts[idx-1]:a[1],orig:a[1],alts,idx,
     sets:isDeload(k)?Math.max(2,Math.ceil(base/2)):base,baseSets:base,min:a[3],max:a[4],rest:a[5],inc:a[6],unit:a[8]||'reps'};
 }
-function history(hk,before){
+function exHistory(hk,before){
   return Object.keys(state.days).filter(k=>k<before).sort().map(k=>{
     const s=state.days[k]&&state.days[k].sets&&state.days[k].sets[hk];
     if(!s)return null;const ok=s.filter(x=>x&&x.done&&x.reps);
@@ -827,13 +827,13 @@ function history(hk,before){
 const e1rm=(kg,reps)=>kg*(1+reps/30)+reps*.01;
 function stalled(ex,k){
   if(ex.inc===0)return false;
-  const h=history(ex.hk,k).filter(x=>!isDeload(x.k));
+  const h=exHistory(ex.hk,k).filter(x=>!isDeload(x.k));
   if(h.length<4)return false;
   const ref=h[h.length-4].best,last3=h.slice(-3).map(x=>x.best);
   return Math.max(...last3)<=ref*1.01;
 }
 function suggest(ex,k){
-  const h=history(ex.hk,k);const prev=h[h.length-1];
+  const h=exHistory(ex.hk,k);const prev=h[h.length-1];
   const u=ex.unit==='s'?'segundos':'reps';
   if(!prev)return{kg:null,txt:`Primera vez: elige un peso con el que hagas ${ex.min}-${ex.max} ${u} dejando 1-2 en reserva.`};
   const top=Math.max(...prev.sets.map(s=>s.kg||0));
@@ -915,7 +915,7 @@ function sleepH(d){
   return d.sleep!=null?d.sleep:null;
 }
 const fmtH=h=>Math.floor(h)+' h '+String(Math.round((h%1)*60)).padStart(2,'0');
-function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk;return false}
+function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk||(d.steps>=stepTarget(k));return false}
 const HAB=[
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
  {k:'prot',n:'Llegar a tu proteína',auto:(d,k)=>totals(k).P>=targets().P*.95},
@@ -1030,6 +1030,7 @@ function vHoy(){
     ${fifthSuggested()?`<section class="card stack"><h3>Toca subir a ${(state.settings.days||4)+1} días</h3><p class="small muted" style="margin:0">Llevas más de 6 meses y te has estancado en ${stalledCount()} ejercicios. Un día más de entreno a la semana es lo que más te va a hacer avanzar ahora.</p><div class="grid2"><button class="btn primary" data-a="fifth-on">Activar</button><button class="btn" data-a="fifth-no">Ahora no</button></div></section>`:''}
     ${checksDue().length?`<section class="card stack"><h3>Pendiente</h3>${checksDue().map(([k,n,,d])=>`<div class="spread" style="padding:6px 0;border-top:1px solid var(--line)"><span style="min-width:0">${esc(n)}<br><span class="small muted">${esc(d)}</span></span><button class="btn sm" data-a="check" data-v="${k}">Hecho</button></div>`).join('')}</section>`:''}
     ${backupDue()?`<section class="card stack"><div class="spread"><h3>Copia del mes</h3><button class="btn primary sm" data-a="backup">Descargar</button></div><p class="small muted" style="margin:0">Guárdala en iCloud o en Google Drive. Así no pierdes tus datos pase lo que pase.</p></section>`:''}
+    ${sleepCard()}
     <section class="card stack">
       <h3>Check-in</h3>
       <div class="grid2">
@@ -1038,7 +1039,7 @@ function vHoy(){
         <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
         <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
       </div>
-      <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. Los pasos los ves en la app Salud o Google Fit.</p>
+      <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
     </section>
     <section class="card stack">
       <div class="spread"><h3>Hábitos clave</h3><span class="chip num ${sc>=7?'on':''}">${sc}/${HAB.length}</span></div>
@@ -1131,6 +1132,7 @@ function vComida(){
       <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>
       ${(state.settings.mex&&Object.values(state.settings.mex).some(a=>a.length))?`<button class="btn ghost sm" data-a="mex-reset">Volver a mostrar los platos quitados</button>`:''}
     </section>
+    ${phaseCard()}
     ${limitsCard()}
     ${subsCard()}
     ${suppCard()}
@@ -1322,7 +1324,7 @@ function vEntreno(){
   if(R){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
       <p class="small muted" style="margin:0">${esc(R.focus)}. Hoy: ${state.settings.commute||0} min andando de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''} = ${dayTotalMin(R)} min. Calentamiento: 5 min de bici o cinta, 10 chin tucks y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
-      <div class="row wrap"><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`;
+      <div class="row wrap"><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${s[k]!==false?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
@@ -1420,7 +1422,7 @@ function vProgreso(){
     <div class="small muted">Meta 1,6. Con tu cintura de ${kgs(lm.waist)} cm, unos hombros de ${nf(lm.waist*1.6,0)} cm. Se consigue subiendo hombros y bajando cintura a la vez.</div>`}
   else ad=`<p class="small muted" style="margin:0">Mide el contorno de hombros junto con la cintura para seguir tu forma en V. La meta es que los hombros midan 1,6 veces la cintura.</p>`;
   const lifts=MAIN_LIFTS.map(([key,n])=>{
-    const h=history(key,'9999');if(!h.length)return'';
+    const h=exHistory(key,'9999');if(!h.length)return'';
     const f=h[0].best,l=h[h.length-1].best,pct=(l/f-1)*100;
     return `<tr><td>${n}</td><td class="r">${nf(f,0)}</td><td class="r">${nf(l,0)}</td><td class="r" style="color:${pct>=0?'var(--ok)':'var(--bad)'}">${pct>=0?'+':''}${nf(pct,0)} %</td></tr>`;
   }).join('');
@@ -1523,6 +1525,18 @@ function vPlan(){
         <div class="field"><label for="po">Ajuste (kcal)</label><input class="inp" id="po" inputmode="numeric" data-s="off" value="${s.off}"></div>
       </div>
     </section>
+    ${STANDALONE?`<section class="card"><details><summary>Pasos desde Salud (iPhone)</summary><div class="small" style="display:grid;gap:8px;margin-top:10px">
+      <p style="margin:0">Una web no puede leer Salud, pero un Atajo de iPhone sí. Lo creas una vez (2 minutos) y luego tus pasos llegan a la app con un toque, o solos cada noche.</p>
+      <ol style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li>Abre la app <b>Atajos</b> → <b>+</b> (nuevo atajo) → nómbralo <b>Pasos a Forja</b>.</li>
+        <li>Añade la acción <b>Buscar muestras de Salud</b>: tipo <b>Pasos</b>, fecha <b>hoy</b>.</li>
+        <li>Añade <b>Calcular estadísticas</b> (o «Calcular»): <b>Suma</b> de las muestras.</li>
+        <li>Añade <b>URL</b> y escribe: <code style="overflow-wrap:anywhere">${esc(location.origin+location.pathname)}?pasos=</code> y al final inserta la variable <b>Suma</b>.</li>
+        <li>Añade <b>Abrir URL</b>. Guarda. La primera vez acepta el permiso de Salud.</li>
+      </ol>
+      <p style="margin:0"><b>Para que sea automático:</b> en Atajos → Automatización → <b>Hora del día</b> 22:00 → Ejecutar inmediatamente → Pasos a Forja. Cada noche se abre la app con tus pasos apuntados.</p>
+      <p style="margin:0" class="muted">También puedes añadir el atajo a la pantalla de inicio o pedírselo a Siri: «Pasos a Forja».</p>
+    </div></details></section>`:''}
     <section class="card stack"><h3>Guardado</h3>
       ${STANDALONE?`<p class="small muted" style="margin:0">Todo se guarda en este móvil, sin depender de nadie y sin pagar nada. Para que dure años: añade la app a la pantalla de inicio, ábrela siempre desde ahí y descarga la copia cada mes (Compartir → Guardar en Archivos → iCloud Drive). Si cambias de móvil, abre esa copia y lo recuperas todo.</p>`:''}
       <p class="small muted" style="margin:0" ${STANDALONE?'hidden':''}>Todo se guarda al momento en este dispositivo y en tu cuenta de Claude. Los días de hace más de 4 meses se resumen solos (peso, medidas, mejores series y calorías) para que quepan 50 años de datos. Para no depender de nada, descarga una copia una vez al mes y guárdala en iCloud o en Google Drive. Con esa copia recuperas todo en cualquier versión de la app.</p>
@@ -1734,10 +1748,72 @@ function onbFinish(){
   ui.onb=null;ui.tab='hoy';ui.toast='Listo. Empieza por apuntar lo que comes hoy.';render();window.scrollTo(0,0);
 }
 
+/* ================= DURACIONES ================= */
+function wksTxt(w){w=Math.max(1,Math.round(w));return w<=10?`${w} semanas`:`${w} semanas (unos ${Math.round(w/4.35)} meses)`}
+function phasePlan(){
+  const s=state.settings,m=s.mode,bf=curBf(),t=bfT(),lo=t-1,hi=t+2,w=curWeight();
+  if(m==='cut'){if(bf==null)return{dur:'Hasta llegar a tu '+lo+' %',det:'Mídete la cintura y la app calcula las semanas.',next:'Volumen limpio o mantenimiento'};
+    const fast=bf>=t+10,rate=w*(fast?.0075:.005)*.8,kg=w*(bf-lo)/100,wk=kg/rate;
+    return{dur:`Unas ${wksTxt(wk)}`,det:`Hasta bajar del ${nf(bf,1)} % al ${lo} %: unos ${nf(kg,1)} kg de grasa a ~${nf(rate,2)} kg por semana.${wk>16?' Cada 12-16 semanas, haz 2 semanas a calorías de mantenimiento: descansas la cabeza y el cuerpo, y luego sigues.':''}`,next:'Volumen limpio (o mantenimiento si estás en tu techo)'}}
+  if(m==='bulk'){const b=bf==null?t:bf,wk=Math.min(36,Math.max(12,(hi-b)/0.125));
+    return{dur:`Unas ${wksTxt(wk)}`,det:`Hasta subir del ${nf(b,1)} % al ${hi} % de grasa, ganando ~${nf(w*.0025,2)} kg por semana. Un volumen de menos de 3 meses no da tiempo a ganar músculo; de más de 9, acumulas demasiada grasa.`,next:`Definición corta hasta el ${lo} %`}}
+  if(m==='recomp'){const left=Math.max(0,12-monthsTraining());
+    return{dur:bf!=null&&bf>t?`Hasta tu ${t} %, unas ${wksTxt(Math.max(8,(bf-t)/0.15))}`:'8-12 semanas',det:`Recomponer funciona mejor el primer año${left>0?` (te quedan unos ${Math.round(left)} meses)`:''}. La app mira tus medidas cada semana y cambia de fase sola cuando toca.`,next:'Volumen limpio o definición, según tu % de grasa'}}
+  return{dur:'Indefinido',det:`Te mantienes en tu ${t} % con el músculo ganado. Si subes del ${hi} %, la app hace una definición corta.`,next:'—'}
+}
+function phaseCard(){const s=state.settings,pp=phasePlan();
+  return `<section class="card stack"><div class="spread"><h3>Cuánto tiempo en esta fase</h3><span class="chip">${esc(PHASES[s.mode].n)}</span></div>
+    <div class="phase"><b>${esc(pp.dur)}</b><span class="small muted">${esc(pp.det)}</span></div>
+    <div class="small"><span class="muted">Después:</span> <b>${esc(pp.next)}</b>. No tienes que acordarte: la app te avisa y cambia las calorías sola.</div>
+    <details><summary class="small">El plan completo de fases</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
+      <li><b>Definición:</b> 0,5 % del peso por semana (0,75 % si te sobra mucha grasa), hasta tu ${bfT()-1} %. Normalmente 8-20 semanas.</li>
+      <li><b>Volumen limpio:</b> 0,25 % del peso por semana, hasta tu ${bfT()+2} %. Normalmente 3-9 meses.</li>
+      <li><b>Recomposición:</b> peso estable; ideal el primer año o volviendo de un parón. 8-12 semanas y la app revalúa.</li>
+      <li><b>Mantenimiento:</b> cuando llegas a tu techo de músculo. Para siempre, con definiciones cortas si te pasas.</li>
+    </ul></details></section>`;
+}
+function routinePlan(){
+  const bi=blockInfo(),mt=monthsTraining(),s=state.settings;
+  return `<section class="card stack"><h3>Cuánto tiempo con esta rutina</h3>
+    <div class="small" style="display:grid;gap:6px">
+      <div class="spread"><span class="muted">Bloque actual</span><b>${bi.block} · semana ${bi.week} de 6</b></div>
+      <div class="spread"><span class="muted">Ejercicios</span><b>Los mismos mientras subas peso</b></div>
+      <div class="spread"><span class="muted">Estructura (${s.days||4} días)</span><b>${(s.days||4)<5?'Hasta que la app pida un día más':'Indefinida'}</b></div>
+    </div>
+    <ul class="small muted" style="margin:0;padding-left:18px;display:grid;gap:4px">
+      <li><b>Cada 6 semanas:</b> 5 de entreno fuerte y 1 de descarga. Lo marca la app.</li>
+      <li><b>Cada ejercicio:</b> lo mantienes mientras progreses, normalmente 3-6 meses. Si llevas 3 sesiones sin mejorar, la app te pide cambiarlo por su alternativa.</li>
+      <li><b>Cambiar de rutina entera:</b> solo cuando te estanques en varios ejercicios a la vez, normalmente después de 6-12 meses${mt>=6?'':` (llevas ${Math.max(0,Math.round(mt))})`}. Cambiar antes no da más resultado: el músculo crece por subir peso en los mismos ejercicios.</li>
+    </ul></section>`;
+}
+/* ================= SUEÑO ================= */
+function sleepNeed(){const a=ageNow();return a<18?[8.5,10]:a<26?[7.5,9]:a<65?[7.5,9]:[7,8]}
+function sleepCard(){
+  const ks=Array.from({length:14},(_,i)=>add(TODAY,-i)),wakes=ks.map(k=>peek(k)&&peek(k).wake).filter(Boolean).map(t=>{const[a,b]=t.split(':').map(Number);return a*60+b});
+  const wake=state.settings.wakeGoal?(()=>{const[a,b]=state.settings.wakeGoal.split(':').map(Number);return a*60+b})():wakes.length?Math.round(wakes.reduce((x,y)=>x+y,0)/wakes.length/5)*5:7*60+30;
+  const need=sleepNeed(),goal=8,bed=(wake-goal*60-15+1440)%1440,hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  const sl=ks.slice(0,7).map(k=>sleepH(peek(k))).filter(x=>x!=null),avg=sl.length?sl.reduce((a,b)=>a+b,0)/sl.length:null;
+  return `<section class="card stack"><div class="spread"><h3>Sueño</h3><span class="chip">${nf(need[0],1)}-${need[1]} h</span></div>
+    <div class="kpis"><div class="kpi"><b class="num">${goal} h</b><span>meta cada noche</span></div><div class="kpi"><b class="num">${hm(bed)}</b><span>a la cama</span></div><div class="kpi"><b class="num">${hm(wake)}</b><span>levantarte</span></div></div>
+    <p class="small muted" style="margin:0">A tu edad necesitas ${nf(need[0],1)}-${need[1]} h. La app pone 8 h de sueño más 15 min para dormirte. ${avg!=null?`Esta semana duermes de media <b style="color:${avg>=need[0]?'var(--ok)':'var(--warn)'}">${fmtH(avg)}</b>.`:'Apunta en el check-in a qué hora te acuestas y te levantas.'}</p>
+    <div class="field"><label for="wk-goal">Hora fija de levantarte (también fines de semana)</label><input class="inp" type="time" id="wk-goal" data-sn="wakeGoal" value="${esc(state.settings.wakeGoal||hm(wake))}"></div>
+    <details><summary class="small">Las 6 reglas que más importan</summary><ol class="small muted" style="margin:6px 0 0;padding-left:20px;display:grid;gap:4px">
+      <li><b>Misma hora de levantarte todos los días</b>, fines de semana incluidos (±30 min). Es lo que más regula el sueño.</li>
+      <li><b>Luz del sol 10 min</b> nada más levantarte.</li>
+      <li><b>Cafeína solo hasta las 15:00</b> y nada de alcohol las noches de entreno.</li>
+      <li><b>Cena 2-3 h antes</b> de acostarte.</li>
+      <li><b>Habitación fresca (18-19 °C), oscura y en silencio.</b> Antifaz y tapones si hace falta.</li>
+      <li><b>Pantallas fuera 30-60 min antes</b>, o al menos el brillo al mínimo y modo noche.</li>
+    </ol>
+    <p class="small muted" style="margin:6px 0 0">Si duermes 8 h y te levantas cansado a menudo, o roncas fuerte, coméntalo con tu médico.</p></details>
+  </section>`;
+}
+
 /* ================= RENDER ================= */
 function render(){
   rebuildRoutine();applySex();
   const needOnb=!state.settings.profile;
+  if(!needOnb&&migrated)autoPhase(true);
   document.body.classList.toggle('onb',needOnb);
   if(needOnb){$('#app').innerHTML=migrated?vOnb():`<div class="onb-wrap" style="align-items:center;justify-content:center"><h1 style="font-size:56px">Forja</h1><p class="muted">Cargando tus datos…</p></div>`;$('#sheet').innerHTML='';return}
   const views={hoy:ui.habits?vHabits:vHoy,comida:ui.shop?vShop:vComida,entreno:vEntreno,progreso:vProgreso,plan:vPlan};
@@ -1924,11 +2000,16 @@ async function standaloneBoot(){
   if(!STANDALONE)return;
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
   try{if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js')}catch(e){}
-  const raw=await IDB.get('state');if(!raw)return;
-  try{const s=JSON.parse(raw);let changed=false;
+  const raw=await IDB.get('state');
+  if(raw)try{const s=JSON.parse(raw);let changed=false;
     if(s.settings&&(s.settings._t||0)>(state.settings._t||0)){state.settings={...DEF,...s.settings};changed=true}
     for(const k in (s.days||{})){const r=s.days[k],l=state.days[k];if(!l||(r&&(r._t||0)>(l._t||0))){state.days[k]=r;changed=true}}
     if(changed){lsSave();render()}}catch(e){}
+  /* Pasos desde la app Salud a través de un Atajo de iPhone: abre ...?pasos=8432 */
+  try{const q=new URLSearchParams(location.search),v=parseInt((q.get('pasos')||'').replace(/\D/g,''));
+    if(v>=0&&v<200000&&q.has('pasos')){const dd=day(TODAY);dd.steps=v;saveDay(TODAY);ui.cur=TODAY;ui.tab='hoy';
+      ui.toast=`Pasos de hoy desde Salud: ${th(v)}${v>=stepTarget(TODAY)?' · meta cumplida':` · te faltan ${th(stepTarget(TODAY)-v)}`}`;
+      window.history.replaceState(null,'',location.pathname);render()}}catch(e){}
 }
 standaloneBoot();
 render();
