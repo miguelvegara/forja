@@ -195,6 +195,20 @@ table.t td.r,table.t th.r{text-align:right;font-variant-numeric:tabular-nums}
 .tabs button span{white-space:nowrap}
 .tabs button svg{width:22px;height:22px}
 .tabs button.on{color:var(--accent);background:var(--accent-soft)}
+.mblk{border-top:1px solid var(--line);padding-top:14px;margin-top:14px;display:grid;gap:8px}
+.mblk:first-child{border-top:0;margin-top:4px;padding-top:0}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mhead .eyebrow{color:var(--accent)}
+.mdish{font-weight:700;font-size:16px;line-height:1.25}
+.mhow{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:10px;padding:8px 10px}
+.frow{display:grid;grid-template-columns:1fr auto;gap:0 12px;padding:8px 0;border-top:1px dashed var(--line)}
+.frow .fn{font-weight:600;font-size:14px;min-width:0}
+.frow .fq{text-align:right;font-weight:700;font-size:14px;white-space:nowrap}
+.frow .fh{font-size:12px;color:var(--muted)}
+.frow .fh.r{text-align:right}
+.frow .feq{grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:3px}
+.frow .feq b{color:var(--ink);font-weight:600}
+.mtot{display:flex;gap:6px;flex-wrap:wrap}
 .swapbtn{border:0;background:transparent;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
 .swapbtn span{color:var(--accent);text-decoration:none}
 .toggle{width:52px;height:32px;border-radius:16px;border:1px solid var(--line);background:var(--sunk);position:relative;flex:none}
@@ -1133,14 +1147,25 @@ function vComida(){
       <button class="btn ghost sm" data-a="add" data-v="${m}">+ Añadir a ${l.toLowerCase()}</button></section>`;
   }).join('');
   const fixed=state.settings.menuFixed!==false;
-  const eqRow=i=>{const e=EQ[i.f];if(!e||!F[e])return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
-    return `<div class="small muted" style="padding:0 0 4px 12px">o ${esc(F[e].n.toLowerCase())}: ${esc(qtyG(F[e],q)||qtyHand(F[e],q))}${qtyG(F[e],q)?' · '+esc(qtyHand(F[e],q)):''}</div>`};
-  const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>`<div style="margin-top:10px"><div class="spread"><span class="eyebrow">${l}</span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div><div class="spread small"><span style="font-weight:600">${esc(tp.names[m].n)}</span><span class="muted num" style="white-space:nowrap">${nf(menu.filter(i=>i.m===m).reduce((a,i)=>a+F[i.f].P*i.q,0))} g prot</span></div>${tp.names[m].how?`<div class="small muted" style="margin:2px 0 4px">${esc(tp.names[m].how)}</div>`:''}${menu.filter(i=>i.m===m).map(i=>`<div class="spread small" style="padding:3px 0 1px"><span>${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span style="text-align:right;white-space:nowrap">${qtyG(F[i.f],i.q)?`<b class="num">${esc(qtyG(F[i.f],i.q))}</b><br><span class="muted">o ${esc(qtyHand(F[i.f],i.q))}</span>`:`<b>${esc(qtyHand(F[i.f],i.q))}</b>`}</span></div>${eqRow(i)}`).join('')}</div>`).join('');
+  const eqTxt=i=>{const e=EQ[i.f];if(!e||!F[e])return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
+    return `<div class="feq">Si no tienes: <b>${esc(F[e].n)}</b> · ${esc(qtyG(F[e],q)||qtyHand(F[e],q))}${qtyG(F[e],q)?` (${esc(qtyHand(F[e],q))})`:''}</div>`};
+  const fRow=i=>{const g=qtyG(F[i.f],i.q);return `<div class="frow"><span class="fn">${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span class="fq num">${esc(g||qtyHand(F[i.f],i.q))}</span>
+    ${g?`<span></span><span class="fh r">${esc(qtyHand(F[i.f],i.q))}</span>`:''}${eqTxt(i)}</div>`};
+  const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>{const its=menu.filter(i=>i.m===m),t=its.reduce((a,i)=>{const f=F[i.f];a.k+=f.k*i.q;a.P+=f.P*i.q;return a},{k:0,P:0});
+    return `<div class="mblk"><div class="mhead"><span class="eyebrow">${l}</span><span class="mtot"><span class="chip num">${nf(t.k)} kcal</span><span class="chip num">${nf(t.P)} g prot</span></span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div>
+      <div class="mdish">${esc(tp.names[m].n)}</div>${tp.names[m].how?`<div class="mhow">${esc(tp.names[m].how)}</div>`:''}
+      <div>${its.map(fRow).join('')}</div></div>`}).join('');
   return header()+`<div class="stack">
     ${kcalCard()}
     <section class="card stack">
       <div class="spread"><h2>Menú de hoy</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
-      <p class="small muted" style="margin:0">${mealPlan().length} comidas al día en ${PHASES[state.settings.mode].n.toLowerCase()}${state.settings.mode==='cut'?' (menos comidas y más grandes: sacian más)':state.settings.mode==='bulk'?' (más comidas: es más fácil comer más)':''}. La app decide y rota los platos sola. La comida y la cena se repiten de lunes a jueves y de viernes a domingo para que cocines solo 2 veces (domingo y jueves). Debajo de cada alimento tienes su equivalente por si no lo tienes. El desayuno y la merienda cambian cada semana. Cada tanda trae platos nuevos. Cuadrado a tu objetivo: <span class="num">${nf(mt.k)} kcal · ${nf(mt.P)} g de proteína</span>. A la derecha, el peso para la báscula y debajo la medida a ojo.</p>
+      <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
+      <details><summary class="small">Cómo leer el menú</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
+        <li>A la derecha, el peso para la báscula (en cocido) y debajo la medida a ojo.</li>
+        <li>«Si no tienes»: el equivalente que da lo mismo.</li>
+        <li>La comida y la cena se repiten de lunes a jueves y de viernes a domingo: cocinas solo el domingo y el jueves. El desayuno y la merienda cambian cada semana.</li>
+        <li>La app rota los platos sola y ajusta las cantidades a tu fase.</li>
+      </ul></details>
       <div>${menuHtml}</div>
       <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>
       ${(state.settings.mex&&Object.values(state.settings.mex).some(a=>a.length))?`<button class="btn ghost sm" data-a="mex-reset">Volver a mostrar los platos quitados</button>`:''}
