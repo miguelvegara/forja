@@ -883,9 +883,25 @@ function cadenceTxt(x){const c=cad();return x<c.a-5?'Suave: acelera un poco':x<=
 function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
 
 /* ================= MENÚ ================= */
+/* Cada día cubre fibra y calcio: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
 function buildMenu(tp){
+  let items=buildMenuCore(tp,[]);
+  for(let pass=0;pass<2;pass++){
+    const mi=micOf(items.map(i=>[i.f,i.q])),extra=[],meals=[...new Set(items.map(i=>i.m))];
+    const snack=meals.includes('merienda')?'merienda':meals.includes('desayuno')?'desayuno':meals[0],dinner=meals.includes('cena')?'cena':meals[meals.length-1];
+    const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca;
+    if(cGap>0)extra.push([snack,'yogur',Math.min(3,Math.ceil(cGap/180))]);
+    const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
+    if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
+    if(!extra.length)break;
+    tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
+  }
+  return items;
+}
+function buildMenuCore(tp){
   const t=targets();const tpl=tp.m;
   const items=[];for(const m in tpl)tpl[m].forEach(([f,q,role])=>{const s=subOf(f);items.push(s?{m,f:s,q:convQ(f,s,q),role,orig:f}:{m,f,q,role})});
+  (tp._extra||[]).forEach(([m,f,q])=>{const ex=items.find(i=>i.m===m&&i.f===f&&i.role==='x');if(ex)ex.q+=q;else items.push({m,f,q,role:'x',auto:1})});
   const sum=(fn,flt)=>items.filter(flt).reduce((a,i)=>a+F[i.f][fn]*i.q,0);
   for(let it=0;it<3;it++){
     const pP=sum('P',i=>i.role==='p'),oP=sum('P',i=>i.role!=='p');
