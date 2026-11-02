@@ -2000,6 +2000,7 @@ function nextSet(hk,i){
   return null;
 }
 function startRest(sec,label,nx){
+  try{document.activeElement&&document.activeElement.blur&&document.activeElement.blur()}catch(e){}
   audio();speak('',true);
   tmr.total=sec;tmr.end=Date.now()+sec*1000;tmr.next=nx;tmr.spoke=false;tmr.label=label;
   $('#tin').classList.remove('go','late');$('#tstop').textContent='Saltar';
@@ -2016,7 +2017,7 @@ function tick(){
     $('#tl').textContent=nx?`${nx.same?'Serie '+(nx.i+1):nx.name.split(',')[0]+' · serie '+(nx.i+1)}${nx.kg!=null?' · '+kgs(nx.kg)+' kg':''}`:'Entreno terminado. ¡Buen trabajo!';
     if(!tmr.spoke&&leftMs>-5000){tmr.spoke=true;
       speak(nx?`Vamos. ${nx.same?'Serie '+(nx.i+1):nx.name.split(',')[0]+', serie '+(nx.i+1)}${nx.kg!=null?', '+String(kgs(nx.kg)).replace(',',' coma ')+' kilos':''}`:'Entreno terminado');
-      if(state.settings.tVib!==false){try{navigator.vibrate&&navigator.vibrate([300,150,300,150,500])}catch(e){}}
+      if(state.settings.tVib!==false&&!/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)){try{navigator.vibrate&&navigator.vibrate([300,150,300,150,500])}catch(e){}} /* en iPhone la vibración activa «Agitar para deshacer» */
       if(nx){const row=document.getElementById('kg-'+nx.hk+'-'+nx.i);if(row){const s=row.closest('.set');if(s){s.classList.add('next');s.scrollIntoView({behavior:'smooth',block:'center'})}}}
     }
     return;
