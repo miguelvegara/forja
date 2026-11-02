@@ -455,6 +455,14 @@ function dayRows(k=ui.cur){
   if(meals.includes('cena'))add(d.cena,'Cena',nm('cena'));
   if(meals.includes('recena'))add(d.cena+90,'Recena',nm('recena'));
   return rows.sort((a,b)=>a.t-b.t)}
+/* Menú de la semana: junta los días que comen lo mismo */
+function weekCard(){
+  const DN=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],mon=monday(ui.cur),ms=mealPlan(),gs=[];
+  for(let i=0;i<7;i++){const k=add(mon,i),n=menuTpl(k).names,sig=ms.map(m=>n[m].n).join('|'),g=gs[gs.length-1];
+    if(g&&g.sig===sig)g.to=i;else gs.push({sig,from:i,to:i,n});
+    if(k===TODAY)gs[gs.length-1].today=1}
+  const lab=g=>g.from===g.to?DN[g.from]:DN[g.from]+' a '+DN[g.to];
+  return `<section class="card stack"><h2>Menú de la semana</h2>${gs.map((g,i)=>`<div style="${i?'padding-top:12px;border-top:1px solid var(--line)':''}"><div class="spread"><span class="eyebrow">${lab(g)}</span>${g.today?'<span class="chip on">Hoy</span>':''}</div>${ms.map(m=>`<div class="small" style="margin-top:6px"><span class="muted">${esc(MEALS.find(x=>x[0]===m)[1])}:</span> ${esc(g.n[m].n)}</div>`).join('')}</div>`).join('')}</section>`}
 function mealHour(m,k=ui.cur){const d=dayTimes(k);return d[m]!=null?toHM(d[m]):''}
 function scheduleCard(){
   const rows=dayRows(),now=new Date(),nm=ui.cur===TODAY?now.getHours()*60+now.getMinutes():-1;
@@ -1213,6 +1221,7 @@ function vComida(){
       <div>${its.filter(i=>!i.auto).map(fRow).join('')}</div>${its.some(i=>i.auto)?`<div class="mextra">${m==='cena'||m==='comida'?'Y de acompañamiento o postre':'Y además'}</div><div>${its.filter(i=>i.auto).map(fRow).join('')}</div>`:''}</div>`}).join('');
   return header()+`<div class="stack">
     ${kcalCard()}
+    ${weekCard()}
     <section class="card stack">
       <div class="spread"><h2>Menú de hoy</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
       <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
