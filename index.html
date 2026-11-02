@@ -201,6 +201,12 @@ table.t td.r,table.t th.r{text-align:right;font-variant-numeric:tabular-nums}
 .mhead .eyebrow{color:var(--accent)}
 .mdish{font-weight:700;font-size:16px;line-height:1.25}
 .mextra{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:10px}
+.daystrip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.daystrip button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:12px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);font:inherit;font-size:11px;font-weight:600;cursor:pointer}
+.daystrip button b{font-size:15px;color:var(--ink)}
+.daystrip button.today{border-color:var(--p)}
+.daystrip button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.daystrip button.on b{color:var(--bg)}
 .mhow{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:10px;padding:8px 10px}
 .frow{display:grid;grid-template-columns:1fr auto;gap:0 12px;padding:8px 0;border-top:1px dashed var(--line)}
 .frow .fn{font-weight:600;font-size:14px;min-width:0}
@@ -1223,7 +1229,8 @@ function vComida(){
     ${kcalCard()}
     ${weekCard()}
     <section class="card stack">
-      <div class="spread"><h2>Menú de hoy</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
+      <div class="spread"><h2>${ui.cur===TODAY?'Menú de hoy':'Menú del '+['domingo','lunes','martes','miércoles','jueves','viernes','sábado'][pk(ui.cur).getDay()]}</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
+      <div class="daystrip">${(()=>{const mon=add(ui.cur,-((pk(ui.cur).getDay()+6)%7));return ['L','M','X','J','V','S','D'].map((l,i)=>{const k=add(mon,i);return `<button data-a="goto" data-v="${k}" class="${k===ui.cur?'on':''}${k===TODAY?' today':''}" aria-label="Ver menú del ${esc(nice(k))}"><span>${l}</span><b class="num">${pk(k).getDate()}</b></button>`}).join('')})()}</div>
       <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
       <details><summary class="small">Cómo leer el menú</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
         <li>A la derecha, el peso para la báscula (en cocido) y debajo la medida a ojo.</li>
@@ -2026,6 +2033,7 @@ document.addEventListener('click',e=>{
   const d=()=>day();
   switch(a){
     case'tab':ui.tab=v;ui.shop=false;ui.habits=false;try{localStorage.setItem(LS+'-tab',v)}catch(_){};render();window.scrollTo(0,0);break;
+    case'goto':ui.cur=v;ui.showWalk=false;ui.swapOpen=null;render();break;
     case'prev':ui.cur=add(ui.cur,-1);ui.showWalk=false;ui.swapOpen=null;render();break;
     case'next':ui.cur=add(ui.cur,1);ui.showWalk=false;ui.swapOpen=null;render();break;
     case'toast-x':ui.toast='';render();break;
