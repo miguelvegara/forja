@@ -1221,6 +1221,8 @@ function vHabits(){
   </div>`;
 }
 
+function dayStrip(){return `<div class="daystrip">${(()=>{const mon=add(ui.cur,-((pk(ui.cur).getDay()+6)%7));return `<button data-a="goto" data-v="${add(mon,-7)}" class="wk" aria-label="Semana anterior">${sicon('left',16)}</button>`+['L','M','X','J','V','S','D'].map((l,i)=>{const k=add(mon,i);return `<button data-a="goto" data-v="${k}" class="${k===ui.cur?'on':''}${k===TODAY?' today':''}" aria-label="Ver menú del ${esc(nice(k))}"><span>${l}</span><b class="num">${pk(k).getDate()}</b></button>`}).join('')+`<button data-a="goto" data-v="${add(mon,7)}" class="wk" aria-label="Semana siguiente">${sicon('right',16)}</button>`})()}</div>
+      ${monday(ui.cur)!==monday(TODAY)?`<button class="btn ghost sm" data-a="goto" data-v="${TODAY}">Volver a hoy</button>`:''}`}
 function vComida(){
   const d=peek(ui.cur)||{foods:[]},tp=menuTpl(ui.cur),bl=blockOf(ui.cur);
   const menu=buildMenu(tp),mt=menuTotals(menu);
@@ -1247,8 +1249,7 @@ function vComida(){
     ${weekCard()}
     <section class="card stack">
       <div class="spread"><h2>${ui.cur===TODAY?'Menú de hoy':'Menú del '+['domingo','lunes','martes','miércoles','jueves','viernes','sábado'][pk(ui.cur).getDay()]+' '+pk(ui.cur).getDate()}</h2><span class="chip">${bl.len===4?'tanda 1 · lun-jue':'tanda 2 · vie-dom'}</span></div>
-      <div class="daystrip">${(()=>{const mon=add(ui.cur,-((pk(ui.cur).getDay()+6)%7));return `<button data-a="goto" data-v="${add(mon,-7)}" class="wk" aria-label="Semana anterior">${sicon('left',16)}</button>`+['L','M','X','J','V','S','D'].map((l,i)=>{const k=add(mon,i);return `<button data-a="goto" data-v="${k}" class="${k===ui.cur?'on':''}${k===TODAY?' today':''}" aria-label="Ver menú del ${esc(nice(k))}"><span>${l}</span><b class="num">${pk(k).getDate()}</b></button>`}).join('')+`<button data-a="goto" data-v="${add(mon,7)}" class="wk" aria-label="Semana siguiente">${sicon('right',16)}</button>`})()}</div>
-      ${monday(ui.cur)!==monday(TODAY)?`<button class="btn ghost sm" data-a="goto" data-v="${TODAY}">Volver a hoy</button>`:''}
+      ${dayStrip()}
       <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
       <details><summary class="small">Cómo leer el menú</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
         <li>A la derecha, el peso para la báscula (en cocido) y debajo la medida a ojo.</li>
@@ -1516,7 +1517,7 @@ function vEntreno(){
   }
   if(!R)html+=stepsCard();
   if(type==='rest')html=`<section class="card"><h2>Descanso</h2><p class="muted small" style="margin:6px 0 0">Hoy no toca nada.</p></section>`+html;
-  return header()+`<div class="stack">${typeSel}${html}</div>`;
+  return header()+`<div class="stack"><section class="card">${dayStrip()}</section>${typeSel}${html}</div>`;
 }
 
 function weightChart(){
