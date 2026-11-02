@@ -427,7 +427,7 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
   if(state.settings.mode==='cut'&&m.comida)m.comida=[...m.comida,['ensalada',1,'x'],['fruta',1,'x']];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
-    for(const ml in m)m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[alt,q,r]:f==='platano'?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r]);} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
+    for(const ml in m)m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[alt,q,r]:f==='platano'&&state.settings.fruitPref!=='platano'?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r]);} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   return{m,names}}
 
 /* Lista de la compra: cantidad cruda por ración (per) y envase (pack) */
@@ -892,7 +892,9 @@ function buildMenu(tp){
     if(cGap>0)extra.push([snack,'yogur',Math.min(3,Math.ceil(cGap/180))]);
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
     if(mi.o3<200&&pass===0)extra.push([snack,'sardinas',.5]); /* omega-3: media lata de sardinas los días sin pescado azul */
-    if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
+    const ban=state.settings.fruitPref==='platano',vGap=MIC_T.vC[0]*.97-mi.vC;
+    if(ban){let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(bro)extra.push([dinner,'brocoli',bro]);const left=fGap-bro*3;if(left>0)extra.push([snack,'fruta',Math.min(2,Math.ceil(left/3))])}
+    else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
     if(!extra.length)break;
     tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
   }
@@ -902,6 +904,8 @@ function buildMenuCore(tp){
   const t=targets();const tpl=tp.m;
   const items=[];for(const m in tpl)tpl[m].forEach(([f,q,role])=>{const s=subOf(f);items.push(s?{m,f:s,q:convQ(f,s,q),role,orig:f}:{m,f,q,role})});
   (tp._extra||[]).forEach(([m,f,q])=>{const ex=items.find(i=>i.m===m&&i.f===f&&i.role==='x');if(ex)ex.q+=q;else items.push({m,f,q,role:'x',auto:1})});
+  if(state.settings.fruitPref==='platano')items.forEach(i=>{if(i.f==='fruta')i.f='platano'});
+  {const seen={};for(let n=items.length-1;n>=0;n--){const i=items[n],k=i.m+'|'+i.f+'|'+i.role;if(seen[k]){seen[k].q+=i.q;items.splice(n,1)}else seen[k]=i}}
   const sum=(fn,flt)=>items.filter(flt).reduce((a,i)=>a+F[i.f][fn]*i.q,0);
   for(let it=0;it<3;it++){
     const pP=sum('P',i=>i.role==='p'),oP=sum('P',i=>i.role!=='p');
@@ -1392,7 +1396,7 @@ function vShop(){
         <div>• <b>Merluza, verduras:</b> ya vienen congeladas: directas al congelador.</div>
         <div>• <b>La noche antes de cocinar</b> (sábado y miércoles), pasa una bolsa de cada a la nevera.</div>
         ${days>=14?`<div>• <b>Lácteos</b> (queso batido, yogur): coge los de fecha más lejana; suelen aguantar 3-5 semanas. <b>Huevos:</b> unas 4 semanas en la nevera.</div>
-        <div>• <b>Fruta:</b> manzanas, naranjas, peras y kiwis aguantan 3-4 semanas en el cajón de la nevera.</div>`:''}
+        <div>• <b>Fruta:</b> ${state.settings.fruitPref==='platano'?'compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas, peras y kiwis aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
       </div></section>`:''}
     <div class="callout small">No compres nada fuera de esta lista: es justo lo que vas a comer. Lo que pone «sobran» es porque el envase es más grande de lo que necesitas; úsalo el mes siguiente. Además: sal, especias y café a tu gusto.</div>
   </div>`;
@@ -1577,6 +1581,7 @@ function vPlan(){
       <p style="margin:0"><b>Lo dejas meses:</b> vuelve con el 70 % de los pesos que usabas y sube cada semana. El músculo vuelve mucho más rápido que la primera vez.</p>
     </div></details></section>
     <section class="card stack">
+      <div class="field"><label>Fruta</label><div class="seg">${[['platano','Solo plátano'],['var','Variada']].map(([k,l])=>`<button data-a="set-fruit" data-v="${k}" class="${(s.fruitPref||'var')===k?'on':''}">${l}</button>`).join('')}</div></div>
       <div class="spread"><span>Menú fijo<div class="small muted">La app decide y va rotando los platos sola. Apágalo solo si quieres poder cambiar platos y alimentos a mano.</div></span><button class="toggle ${s.menuFixed!==false?'on':''}" data-a="menu-fixed" aria-pressed="${s.menuFixed!==false}" aria-label="Menú fijo"></button></div>
     </section>
     <section class="card stack"><h3>Fase</h3>
@@ -2038,6 +2043,7 @@ document.addEventListener('click',e=>{
     case'import':$('#io').hidden=false;$('#io').value='';$('#io-ok').hidden=false;$('#io').focus();break;
     case'import-ok':{try{importData($('#io').value)}catch(_){el.textContent='Texto no válido'}break}
     case'backup':doBackup(el);break;
+    case'set-fruit':state.settings.fruitPref=v;saveSettings();render();break;
     case'menu-fixed':state.settings.menuFixed=state.settings.menuFixed===false;saveSettings();render();break;
     case'cal-set':{const v=parseNum($('#cal-in').value);const ms=measures();const m=ms.filter(x=>x.k>add(TODAY,-14)).pop();
       if(!(v>2&&v<65)){ui.toast='Pon el % de la DEXA, por ejemplo 17,4.';render();break}
