@@ -1480,7 +1480,7 @@ function vEntreno(){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
       <p class="small muted" style="margin:0">${esc(R.focus)}. Hoy: ${state.settings.commute||0} min andando de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''} = ${dayTotalMin(R)} min. Calentamiento: 5 min de bici o cinta, 10 chin tucks y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
       <div class="row wrap"><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
-    {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${s[k]!==false?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${s[k]!==false}" aria-label="${l}"></button></div>`;
+    {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso (en iPhone pausa la música)')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
       <button class="btn block sm" style="margin-top:8px" data-a="ttest">Probar aviso (5 s)</button>
@@ -1996,7 +1996,7 @@ function clearTones(){tmr.nodes.forEach(o=>{try{o.stop()}catch(e){}});tmr.nodes=
 function scheduleTones(){
   clearTones();const s=state.settings;if(s.tSound===false||!tmr.ac)return;
   const left=(tmr.end-Date.now())/1000,t0=tmr.ac.currentTime;
-  if(s.tWarn!==false&&left>11){tone(t0+left-10,660,.12,.35);tone(t0+left-9.8,660,.12,.35)}
+  if(s.tWarn===true&&left>11){tone(t0+left-10,660,.12,.35);tone(t0+left-9.8,660,.12,.35)}
   if(left>0){tone(t0+left,880,.18,.6);tone(t0+left+.28,880,.18,.6);tone(t0+left+.56,1320,.45,.7)}
 }
 function speak(text,prime){try{if(state.settings.tVoice===false||!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(prime?' ':text);u.lang='es-ES';u.rate=1.05;if(prime)u.volume=0;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
@@ -2018,7 +2018,7 @@ function tick(){
   const leftMs=tmr.end-Date.now(),left=Math.ceil(leftMs/1000);
   const bar=$('#tbar');if(bar)bar.style.width=Math.max(0,Math.min(100,(1-leftMs/(tmr.total*1000))*100))+'%';
   if(left<=0){
-    const ov=Math.floor(-leftMs/1000);$('#tm').textContent=ov<3?'¡Ya!':'+'+Math.floor(ov/60)+':'+String(ov%60).padStart(2,'0');$('#tin').classList.toggle('late',ov>=30);
+    const ov=Math.floor(-leftMs/1000);$('#tm').textContent='+'+Math.floor(Math.max(0,ov)/60)+':'+String(Math.max(0,ov)%60).padStart(2,'0');$('#tin').classList.toggle('late',ov>=30);
     if(tmr.spoke)return;
     const nx=tmr.next;$('#tin').classList.add('go');$('#tin').classList.remove('late');$('#tstop').textContent='Vamos';
     $('#tl').textContent=nx?`${nx.same?'Serie '+(nx.i+1):nx.name.split(',')[0]+' · serie '+(nx.i+1)}${nx.kg!=null?' · '+kgs(nx.kg)+' kg':''}`:'Entreno terminado. ¡Buen trabajo!';
@@ -2029,7 +2029,7 @@ function tick(){
     }
     return;
   }
-  if(left===10&&state.settings.tWarn!==false)$('#tl').textContent='10 segundos: prepárate';
+  if(left===10&&state.settings.tWarn===true)$('#tl').textContent='10 segundos: prepárate';
   $('#tm').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
 }
 /* pantalla encendida en el gym */
@@ -2077,7 +2077,7 @@ document.addEventListener('click',e=>{
       saveDay();render();if(s.done)startRest(+el.dataset.rest,el.dataset.n,nextSet(el.dataset.ex,i));break}
     case't-add':if(tmr.end<Date.now()){tmr.end=Date.now();tmr.total=0}tmr.end+=15000;tmr.total+=15;tmr.spoke=false;$('#tin').classList.remove('go');$('#tstop').textContent='Saltar';audio();scheduleTones();clearInterval(tmr.id);tick();tmr.id=setInterval(tick,250);break;
     case't-stop':clearInterval(tmr.id);clearTones();$('#timer').hidden=true;break;
-    case'tset':{state.settings[v]=state.settings[v]===false;saveSettings();if(v==='tAwake')keepAwake(ui.tab==='entreno'&&state.settings.tAwake!==false);render();break}
+    case'tset':{state.settings[v]=v==='tWarn'?state.settings[v]!==true:state.settings[v]===false;saveSettings();if(v==='tAwake')keepAwake(ui.tab==='entreno'&&state.settings.tAwake!==false);render();break}
     case'ttest':audio();speak('',true);tmr.total=5;tmr.end=Date.now()+5000;tmr.next={same:true,i:1,kg:20,name:'Prueba'};tmr.spoke=false;$('#tin').classList.remove('go');$('#tl').textContent='Prueba de aviso: 5 segundos';$('#timer').hidden=false;clearInterval(tmr.id);scheduleTones();tick();tmr.id=setInterval(tick,250);break;
     case'add':ui.sheet={meal:v||mealNow()};ui.q='';ui.cat='todos';renderSheet();break;
     case'sheet-close':ui.sheet=null;renderSheet();break;
