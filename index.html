@@ -171,6 +171,7 @@ details[open] summary::after{content:"－"}
 .timer .lbl{flex:1;min-width:0;font-size:13px;opacity:.85;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tbar{position:absolute;left:0;right:0;bottom:0;height:4px}.tbar i{display:block;height:100%;width:0;background:var(--accent)}
 .timer .in.go{background:var(--ok);color:#fff;animation:pulse 1s ease-in-out 3}
+.timer .in.go.late{background:var(--warn,#d9534f);animation:none}
 @keyframes pulse{50%{transform:scale(1.03)}}
 .timer button{background:transparent;border:1px solid currentColor;color:inherit;border-radius:10px;height:36px;padding:0 11px;font-weight:600}
 
@@ -2009,7 +2010,7 @@ function nextSet(hk,i){
 function startRest(sec,label,nx){
   audio();speak('',true);
   tmr.total=sec;tmr.end=Date.now()+sec*1000;tmr.next=nx;tmr.spoke=false;tmr.label=label;
-  $('#tin').classList.remove('go');$('#tstop').textContent='Saltar';
+  $('#tin').classList.remove('go','late');$('#tstop').textContent='Saltar';
   $('#tl').textContent=nx?`Descanso · luego ${nx.same?'serie '+(nx.i+1):nx.name.split(',')[0]+', serie '+(nx.i+1)}${nx.kg!=null?' con '+kgs(nx.kg)+' kg':''}`:'Descanso · último ejercicio hecho';
   $('#timer').hidden=false;clearInterval(tmr.id);scheduleTones();tick();tmr.id=setInterval(tick,250);
 }
@@ -2017,15 +2018,16 @@ function tick(){
   const leftMs=tmr.end-Date.now(),left=Math.ceil(leftMs/1000);
   const bar=$('#tbar');if(bar)bar.style.width=Math.max(0,Math.min(100,(1-leftMs/(tmr.total*1000))*100))+'%';
   if(left<=0){
-    $('#tm').textContent='¡Ya!';clearInterval(tmr.id);
-    const nx=tmr.next;$('#tin').classList.add('go');$('#tstop').textContent='Vamos';
+    const ov=Math.floor(-leftMs/1000);$('#tm').textContent=ov<3?'¡Ya!':'+'+Math.floor(ov/60)+':'+String(ov%60).padStart(2,'0');$('#tin').classList.toggle('late',ov>=30);
+    if(tmr.spoke)return;
+    const nx=tmr.next;$('#tin').classList.add('go');$('#tin').classList.remove('late');$('#tstop').textContent='Vamos';
     $('#tl').textContent=nx?`${nx.same?'Serie '+(nx.i+1):nx.name.split(',')[0]+' · serie '+(nx.i+1)}${nx.kg!=null?' · '+kgs(nx.kg)+' kg':''}`:'Entreno terminado. ¡Buen trabajo!';
     if(!tmr.spoke&&leftMs>-5000){tmr.spoke=true;
       speak(nx?`Vamos. ${nx.same?'Serie '+(nx.i+1):nx.name.split(',')[0]+', serie '+(nx.i+1)}${nx.kg!=null?', '+String(kgs(nx.kg)).replace(',',' coma ')+' kilos':''}`:'Entreno terminado');
       if(state.settings.tVib!==false){try{navigator.vibrate&&navigator.vibrate([300,150,300,150,500])}catch(e){}}
       if(nx){const row=document.getElementById('kg-'+nx.hk+'-'+nx.i);if(row){const s=row.closest('.set');if(s){s.classList.add('next');s.scrollIntoView({behavior:'smooth',block:'center'})}}}
     }
-    setTimeout(()=>{if(Date.now()>=tmr.end+9000)$('#timer').hidden=true},9500);return;
+    return;
   }
   if(left===10&&state.settings.tWarn!==false)$('#tl').textContent='10 segundos: prepárate';
   $('#tm').textContent=Math.floor(left/60)+':'+String(left%60).padStart(2,'0');
@@ -2038,7 +2040,7 @@ async function keepAwake(on){
     else if(!on&&wake){await wake.release();wake=null}
   }catch(e){wake=null}
 }
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(ui.tab==='entreno')keepAwake(state.settings.tAwake!==false);if(!$('#timer').hidden&&tmr.end>Date.now()){audio();scheduleTones();tick()}}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(ui.tab==='entreno')keepAwake(state.settings.tAwake!==false);if(!$('#timer').hidden){if(tmr.end>Date.now()){audio();scheduleTones()}tick()}}});
 
 /* ================= EVENTOS ================= */
 function loadMenu(){const items=buildMenu(menuTpl(ui.cur));const d=day();items.forEach(i=>d.foods.push({id:uid(),f:i.f,q:i.q,m:i.m}));saveDay()}
