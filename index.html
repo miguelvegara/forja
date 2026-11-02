@@ -343,7 +343,7 @@ const MIC_T={fib:[35,'Fibra','g'],Ca:[1000,'Calcio','mg'],Fe:[8,'Hierro','mg'],M
 /* Grupos para cambiar un alimento por otro equivalente. La cantidad se ajusta para dar lo mismo del macro clave. */
 const GROUPS={
  prot:{n:'Proteína',key:'P',f:['pollo','ternera','salmon','merluza','atun','sardinas','mejillones','burger','pavof','claras','huevo']},
- carb:{n:'Hidratos',key:'C',f:['arroz','pasta','patata','legumbre','quinoa','pan','molde','avena','tortitas','cereales']},
+ carb:{n:'Hidratos',key:'C',f:['arroz','pasta','patata','legumbre','pan','molde','avena','tortitas','cereales']},
  grasa:{n:'Grasa',key:'F',f:['aceite','aguacate','nueces','cacahuete','queso']},
  lact:{n:'Lácteos y batidos',key:'P',f:['leche','skyr','batido','yogur','whey']},
  fruta:{n:'Fruta',key:'C',f:['platano','fruta','citrico']},
@@ -351,7 +351,7 @@ const GROUPS={
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
 const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
- arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'quinoa',quinoa:'arroz',pan:'avena',avena:'pan',tortitas:'pan',cereales:'avena',
+ arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',pan:'avena',avena:'pan',tortitas:'pan',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
  fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
 function groupOf(f){for(const g in GROUPS)if(GROUPS[g].f.includes(f))return g;return null}
@@ -381,7 +381,7 @@ const OPTS={
   {id:'currypollo',how:'Pollo y arroz del tupper con el salteado congelado y una cucharadita de curry: 4 min al microondas.',n:'Pollo al curry con arroz basmati',i:[['pollo',2,'x'],['arroz',2,'c'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'garbanzos',how:'Garbanzos de bote enjuagados con espinacas congeladas, pollo del tupper y un huevo ya cocido: 4 min al microondas.',n:'Garbanzos con espinacas, pollo y huevo',i:[['legumbre',2,'c'],['pollo',1,'x'],['huevo',1,'x'],['espinacas',1.5,'x'],['aceite',1,'f']]},
   {id:'merluzacom',how:'Merluza congelada 6 min al microondas tapada; patatas de microondas 8 min; ensalada de bolsa.',n:'Merluza al horno con patatas y ensalada',i:[['merluza',1.5,'x'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',1,'f']]},
-  {id:'quinoapollo',how:'Quinoa y pollo del tupper, aguacate o guacamole de bote y ensalada de bolsa en un bol.',n:'Bol de quinoa con pollo, aguacate y verduras',i:[['pollo',2,'x'],['quinoa',2,'c'],['aguacate',.5,'x'],['ensalada',1.5,'x'],['aceite',.5,'f']]}],
+  {id:'quinoapollo',how:'Patata cocida (o en bolsa al microondas, 5 min) y pollo del tupper, aguacate o guacamole de bote y ensalada de bolsa en un bol.',n:'Bol de patata con pollo, aguacate y ensalada',i:[['pollo',2,'x'],['patata',2,'c'],['aguacate',.5,'x'],['ensalada',1.5,'x'],['aceite',.5,'f']]}],
  merienda:[
   {id:'batido',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con nueces y fruta',i:[['batido',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
   {id:'bocata',how:'Pollo del tupper en pan con tomate. Sin cocinar.',n:'Bocadillo de pollo con tomate',i:[['pan',1.5,'c'],['pollo',1,'x'],['fruta',1,'x'],['aceite',.5,'f']]},
@@ -1216,7 +1216,7 @@ function vComida(){
       <ul style="margin:0;padding-left:20px;display:grid;gap:4px">
         <li><b>Tuppers de cristal</b> y nunca calentar en plástico: con el calor el plástico suelta microplásticos. Es el cambio más barato y de más impacto.</li>
         <li><b>Legumbre de bote enjuagada</b> bajo el grifo: le quitas casi la mitad de la sal.</li>
-        <li><b>Arroz y quinoa en olla</b> el día de cocinar, para toda la tanda. Si un día usas vasitos, pásalos a un plato antes del microondas.</li>
+        <li><b>Arroz en olla</b> el día de cocinar, para toda la tanda. Si un día usas vasitos, pásalos a un plato antes del microondas.</li>
         <li><b>Verdura congelada sin miedo:</b> es igual de nutritiva que la fresca.</li>
         <li><b>Carne sin procesar:</b> pechuga, filete o carne picada natural, no preparados ni embutidos. Mira que la etiqueta tenga 1-2 ingredientes.</li>
         <li><b>Sal:</b> menos de una cucharadita al día en total. Usa especias, limón o ajo para dar sabor.</li>
@@ -1349,7 +1349,7 @@ function prepCard(){
     <p class="small" style="margin:0"><b>Domingo y jueves, unos 40 minutos:</b></p>
     <ol class="small" style="margin:4px 0 0;padding-left:20px;display:grid;gap:4px">
       <li>Toda la carne de la tanda (pollo y, si toca, filetes) en una bandeja al horno a 200 °C, 25 min, con sal y especias.</li>
-      <li>Mientras, el arroz, la pasta o la quinoa en una olla.</li>
+      <li>Mientras, el arroz o la pasta en una olla.</li>
       <li>Deja enfriar, corta el pollo en tiras y reparte todo en tuppers de cristal, uno por día.</li>
     </ol>
     <p class="small muted" style="margin:6px 0 0">El resto de días solo calientas: pescado y verduras congeladas, patatas en bolsa y lo del tupper van al microondas. Nada de sartén.</p>
