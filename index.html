@@ -351,7 +351,7 @@ const GROUPS={
  veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','judias','salteado','espinacas','verdura']}
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
-const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
+const EQ={pollo:'ternera',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
  arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',pan:'molde',molde:'pan',avena:'cereales',tortitas:'molde',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
  fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
@@ -381,7 +381,7 @@ const OPTS={
   {id:'lentejasarroz',how:'Lentejas de bote enjuagadas con el salteado congelado, pollo y arroz del tupper: 4 min al microondas. Huevo ya cocido.',n:'Lentejas con arroz, pollo y huevo',i:[['legumbre',2,'c'],['arroz',1,'c'],['huevo',1,'x'],['pollo',1,'p'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'currypollo',how:'Pollo y arroz del tupper con el salteado congelado y una cucharadita de curry: 4 min al microondas.',n:'Pollo al curry con arroz basmati',i:[['pollo',2,'x'],['arroz',2,'c'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'garbanzos',how:'Garbanzos de bote enjuagados con espinacas congeladas, pollo del tupper y un huevo ya cocido: 4 min al microondas.',n:'Garbanzos con espinacas, pollo y huevo',i:[['legumbre',2,'c'],['pollo',1,'x'],['huevo',1,'x'],['espinacas',1.5,'x'],['aceite',1,'f']]},
-  {id:'merluzacom',how:'Merluza congelada 6 min al microondas tapada; patatas de microondas 8 min; ensalada de bolsa.',n:'Merluza al horno con patatas y ensalada',i:[['merluza',1.5,'x'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',1,'f']]},
+  {id:'merluzacom',how:'Pollo del tupper 2 min al microondas; patatas de microondas 8 min; ensalada de bolsa.',n:'Pollo con patatas y ensalada',i:[['pollo',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',1,'f']]},
   {id:'quinoapollo',how:'Patata cocida (o en bolsa al microondas, 5 min) y pollo del tupper, aguacate o guacamole de bote y ensalada de bolsa en un bol.',n:'Bol de patata con pollo, aguacate y ensalada',i:[['pollo',2,'x'],['patata',2,'c'],['aguacate',.5,'x'],['ensalada',1.5,'x'],['aceite',.5,'f']]}],
  merienda:[
   {id:'batido',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con nueces y fruta',i:[['batido',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
@@ -396,7 +396,7 @@ const OPTS={
   {id:'skyrnoche',how:'Sin cocinar.',n:'Queso batido con nueces y fruta',i:[['batido',0.75,'x'],['nueces',1,'f'],['fruta',1,'x']]},
   {id:'yogurcereal',how:'Sin cocinar.',n:'Yogur con cereales y frutos secos',i:[['yogur',2,'x'],['cereales',1,'c'],['nueces',.5,'f']]}],
  cena:[
-  {id:'merluza',how:'Merluza congelada 6 min al microondas tapada, patatas de microondas, judías verdes al microondas y 1 huevo ya cocido.',fish:1,n:'Merluza con patata y huevo',i:[['huevo',1,'x'],['merluza',1,'p'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f']]},
+  {id:'merluza',how:'Pollo del tupper, patatas de microondas y judías verdes al microondas, con un chorrito de aceite y pimentón.',fish:1,n:'Pollo al pimentón con patata y judías',i:[['pollo',1.5,'p'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f']]},
   {id:'tortilla',how:'Patatas de microondas en dados con los huevos y las claras batidos por encima, 3 min más al microondas. Ensalada de bolsa.',n:'Tortilla de patata al microondas con ensalada',i:[['huevo',2,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1,'x'],['aceite',1,'f']]},
   {id:'pollocena',how:'Pollo del tupper, boniato o patata al microondas 8 min y brócoli congelado al microondas.',n:'Pollo a la plancha con boniato',i:[['pollo',1.5,'p'],['patata',2,'c'],['brocoli',1,'x'],['aceite',.5,'f']]},
   {id:'burger',how:'Bocadillo con el pollo del tupper en tiras, tomate y ensalada de bolsa. Sin cocinar.',n:'Bocadillo de pollo con ensalada',i:[['pollo',1.5,'p'],['pan',1.5,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
@@ -405,9 +405,9 @@ const OPTS={
   {id:'ternera',how:'Filetes del tupper, patatas de microondas y judías verdes al microondas. Queso batido de postre.',n:'Filete de ternera o lomo con patata y queso batido de postre',i:[['ternera',1,'x'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'lentejascena',how:'Lentejas de bote enjuagadas con el salteado congelado, 4 min al microondas, y 1 huevo ya cocido. Queso batido de postre.',n:'Lentejas estofadas con verduras, huevo y queso batido de postre',i:[['legumbre',2,'c'],['huevo',1,'x'],['salteado',1.5,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'pastapollo',how:'Pasta y pollo del tupper con brócoli congelado, todo 4 min al microondas.',n:'Pasta integral con pollo y verduras',i:[['pollo',1.5,'p'],['pasta',2,'c'],['brocoli',1.5,'x'],['aceite',.5,'f']]},
-  {id:'sardinascena',how:'Una lata de sardinas y merluza congelada 6 min al microondas; patatas de microondas y ensalada de bolsa.',fish:1,n:'Sardinas y merluza con patata y ensalada',i:[['sardinas',1,'x'],['merluza',.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
-  {id:'bacalao',how:'Merluza o bacalao congelado 6 min al microondas con garbanzos de bote enjuagados y espinacas congeladas.',fish:1,n:'Bacalao con garbanzos y espinacas',i:[['merluza',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
-  {id:'mejillones',how:'Una lata de mejillones y merluza congelada 6 min al microondas; patatas de microondas y ensalada de bolsa.',fish:1,n:'Mejillones y merluza con patata y ensalada',i:[['mejillones',1,'x'],['merluza',1,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]}]
+  {id:'sardinascena',how:'Una lata de sardinas; tortilla de claras (2 min en sartén o microondas); patatas de microondas y ensalada de bolsa.',fish:1,n:'Sardinas con tortilla de claras, patata y ensalada',i:[['sardinas',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
+  {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
+  {id:'mejillones',how:'Una lata de mejillones; tortilla de claras (2 min en sartén o microondas); patatas de microondas y ensalada de bolsa.',fish:1,n:'Mejillones con tortilla de claras, patata y ensalada',i:[['mejillones',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]}]
 };
 const STRIDE={desayuno:1,comida:3,merienda:1,cena:1,recena:1};
 function blockOf(k){
@@ -1225,7 +1225,7 @@ function vComida(){
       </ul>
       <p style="margin:0"><b>Intercambios 1 a 1</b>, misma cantidad:</p>
       <ul style="margin:0;padding-left:20px;display:grid;gap:4px">
-        <li>Pollo = pavo = lomo de cerdo = ternera magra = merluza = salmón</li>
+        <li>Pollo = pavo = lomo de cerdo = ternera magra</li>
         <li>Arroz = pasta = patata = boniato = legumbre (mismos puños o gramos)</li>
         <li>Avena = pan (1 puñado de avena ≈ 1 trozo de pan de un palmo)</li>
         <li>Cualquier fruta por otra; cualquier verdura por otra</li>
@@ -1398,7 +1398,7 @@ function vShop(){
     ${days>4?`<section class="card stack"><h3>Al llegar a casa</h3>
       <div class="small" style="display:grid;gap:6px">${freezePlan(days).map(x=>x.f==='pan'?`<div>• <b>Pan:</b> córtalo en trozos de un palmo y congélalo en bolsas de ${Math.max(1,Math.round(x.avg/60))} trozo${Math.round(x.avg/60)>1?'s':''} (una por día). Tuéstalo directamente congelado.</div>`
         :`<div>• <b>${esc(SHOP[x.f].n)}:</b> ${x.n>1?`repártelo en <b>${x.n} bolsas de ~${nf(Math.round(x.avg/50)*50)} g</b> y congélalas (una por tanda de cocina).`:`congélalo en <b>1 bolsa de ~${nf(Math.round(x.avg/50)*50)} g</b> para su tanda de cocina.`}</div>`).join('')}
-        <div>• <b>Merluza, verduras:</b> ya vienen congeladas: directas al congelador.</div>
+        <div>• <b>Verduras congeladas:</b> ya vienen congeladas: directas al congelador.</div>
         <div>• <b>La noche antes de cocinar</b> (sábado y miércoles), pasa una bolsa de cada a la nevera.</div>
         ${days>=14?`<div>• <b>Lácteos</b> (queso batido, yogur): coge los de fecha más lejana; suelen aguantar 3-5 semanas. <b>Huevos:</b> unas 4 semanas en la nevera.</div>
         <div>• <b>Fruta:</b> ${['platano','mix'].includes(state.settings.fruitPref)?'las naranjas aguantan 3-4 semanas en la nevera. Los plátanos: compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas y peras aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
