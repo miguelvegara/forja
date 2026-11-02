@@ -426,6 +426,8 @@ function optFor(k,meal){
   let src=list,base=(meal==='desayuno'||meal==='merienda')?bl.wn:bl.b;
   if(meal==='recena')base=bl.wn;
   if(meal==='cena'){const half=bl.b%2;src=list.filter(o=>!!o.fish===!!half);base=bl.wn}
+  /* Mediterránea: la comida de vie-dom siempre es de legumbre (3 veces por semana) */
+  if(meal==='comida'&&bl.len===3&&k>='2026-11-09'){const lg=list.filter(o=>o.i.some(x=>x[0]==='legumbre'||x[0]==='lentejas'));if(lg.length)src=lg;base=bl.wn}
   const ok=src.filter(o=>!ex.includes(o.id));const pool=ok.length?ok:src;
   const shift=((state.settings.mswap||{})[bl.key+'|'+meal])||0;
   const i=((base*STRIDE[meal]+shift)%pool.length+pool.length)%pool.length;
