@@ -430,7 +430,38 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
     for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','brocoli','espinacas'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
+  /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
+  if(trainsOn(k)&&m.merienda)m.merienda=[...m.merienda,['platano',1,'x']];
   return{m,names}}
+function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]||t==='walk'}
+/* Horario del día, calculado desde la hora de entreno */
+const toMin=t=>{const[a,b]=String(t||'20:00').split(':').map(Number);return (a||0)*60+(b||0)};
+const toHM=x=>{x=((Math.round(x/5)*5)%1440+1440)%1440;return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};
+function dayTimes(k=ui.cur){
+  const T=toMin(state.settings.trainTime),train=trainsOn(k),late=T>=16*60,type=dayType(k),R=ROUTINE[type];
+  const dur=!train?0:R?dayTotalMin(R):walkPlan(k).min;
+  return{T,train,late,dur,desayuno:state.settings.wakeGoal?toMin(state.settings.wakeGoal)+30:8.5*60,comida:14*60,merienda:train&&late?T-150:17.5*60,cena:train&&late?T+dur+15:21*60}}
+function dayRows(k=ui.cur){
+  const d=dayTimes(k),tp=menuTpl(k),meals=mealPlan(),nm=m=>tp.names[m]?tp.names[m].n:'',rows=[];
+  const add=(t,h,x,c)=>rows.push({t,h,x,c});
+  const pl=Math.round(buildMenu(tp).filter(i=>i.m==='merienda'&&i.f==='platano').reduce((n,i)=>n+i.q,0))||1;
+  if(meals.includes('desayuno'))add(state.settings.wakeGoal?toMin(state.settings.wakeGoal)+30:8.5*60,'Desayuno',nm('desayuno'));
+  if(meals.includes('comida'))add(d.comida,'Comida',d.train&&d.late?nm('comida')+'. Cómela entera: de aquí sale gran parte de la energía.':nm('comida'));
+  if(d.train&&d.late)add(Math.min(15*60,d.T-300),'Último café','A partir de aquí nada de cafeína ni preentreno, para dormir bien.');
+  if(d.train&&!d.late)add(d.T-45,'Plátano','Un plátano 45 min antes y un vaso de agua. Es un extra del menú.');
+  if(meals.includes('merienda'))add(d.merienda,'Merienda',d.train&&d.late?nm('merienda')+`, con ${pl===1?'1 plátano':pl+' plátanos'}. Es tu comida de antes de entrenar.`:nm('merienda'));
+  else if(d.train&&d.late)add(d.T-90,'Antes de entrenar','Guarda la fruta de la comida y tómala ahora. Sin merienda, esto es lo que te da energía.');
+  if(d.train)add(d.T,'Entreno',d.dur+' min. Agua durante toda la tarde.',1);
+  if(meals.includes('cena'))add(d.cena,'Cena',nm('cena'));
+  if(meals.includes('recena'))add(d.cena+90,'Recena',nm('recena'));
+  return rows.sort((a,b)=>a.t-b.t)}
+function mealHour(m,k=ui.cur){const d=dayTimes(k);return d[m]!=null?toHM(d[m]):''}
+function scheduleCard(){
+  const rows=dayRows(),now=new Date(),nm=ui.cur===TODAY?now.getHours()*60+now.getMinutes():-1;
+  const next=ui.cur===TODAY?rows.findIndex(r=>r.t>=nm):-1;
+  return `<section class="card stack"><h2>Horario de hoy</h2><label class="spread small muted">Hora de entreno<input class="inp" style="width:120px;padding:6px 8px" type="time" aria-label="Hora de entreno" data-sn="trainTime" value="${esc(state.settings.trainTime||'20:00')}"></label>
+    <div>${rows.map((r,i)=>`<div class="row" style="gap:12px;align-items:flex-start;padding:9px 0;${i?'border-top:1px solid var(--line);':''}"><b class="num" style="min-width:48px${i===next?';color:var(--ok)':''}">${toHM(r.t)}</b><span style="min-width:0"><b>${esc(r.h)}</b>${i===next?' <span class="unit">ahora toca</span>':''}<br><span class="small muted">${esc(r.x)}</span></span></div>`).join('')}</div>
+  </section>`}
 
 /* Lista de la compra: cantidad cruda por ración (per) y envase (pack) */
 const SHOP_SECS=['Carne y pescado','Huevos y lácteos','Charcutería','Fruta y verdura','Panadería','Despensa','Conservas','Otras tiendas'];
@@ -584,7 +615,7 @@ const DAYNAMES=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sáb
 const MAIN_LIFTS=[['pressInc','Press inclinado'],['jalon','Jalón al pecho'],['pressHombro','Press de hombro'],['lateral','Elevaciones laterales'],['hackA','Sentadilla hack'],['rumano','Peso muerto rumano']];
 const SPEEDS=[[4.5,'Tranquilo',3.5],[5.5,'Ligero',4.3],[6.5,'Rápido',5.0]];
 
-const DEF={shopDays:30,h:175,age:30,w0:75,mode:'recomp',autoPhase:true,off:0,walkMin:80,commute:10,walkSpeed:5.5,steps:10000,menu:0,shopDone:{},swaps:{},progStart:'2026-10-26',trainStart:'2026-09-25',adjWeek:'',lastBackup:'',ageAt:'2026-10-28',fifth:false,checks:{}};
+const DEF={shopDays:30,h:175,age:30,w0:75,mode:'recomp',autoPhase:true,off:0,walkMin:80,commute:10,walkSpeed:5.5,steps:10000,menu:0,shopDone:{},swaps:{},progStart:'2026-10-26',trainStart:'2026-09-25',adjWeek:'',lastBackup:'',ageAt:'2026-10-28',fifth:false,checks:{},trainTime:'20:00'};
 
 /* ================= UTILIDADES ================= */
 const $=s=>document.querySelector(s);
@@ -1066,6 +1097,7 @@ function vHoy(){
   const sc=habScore(ui.cur);
   return header()+`<div class="stack">
     ${heroCard()}
+    ${scheduleCard()}
     ${weeklyCard()}
     <section class="card stack">
       <div class="spread"><h3>Comida</h3><span class="small muted num">${nf(totals().P)} / ${tg.P} g proteína</span></div>
@@ -1176,7 +1208,7 @@ function vComida(){
   const fRow=i=>{const g=qtyG(F[i.f],i.q);return `<div class="frow"><span class="fn">${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span class="fq num">${esc(g||qtyHand(F[i.f],i.q))}</span>
     ${g?`<span></span><span class="fh r">${esc(qtyHand(F[i.f],i.q))}</span>`:''}${eqTxt(i)}</div>`};
   const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>{const its=menu.filter(i=>i.m===m),t=its.reduce((a,i)=>{const f=F[i.f];a.k+=f.k*i.q;a.P+=f.P*i.q;return a},{k:0,P:0});
-    return `<div class="mblk"><div class="mhead"><span class="eyebrow">${l}</span><span class="mtot"><span class="chip num">${nf(t.k)} kcal</span><span class="chip num">${nf(t.P)} g prot</span></span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div>
+    return `<div class="mblk"><div class="mhead"><span class="eyebrow">${l}${mealHour(m)?` · ${mealHour(m)}`:''}</span><span class="mtot"><span class="chip num">${nf(t.k)} kcal</span><span class="chip num">${nf(t.P)} g prot</span></span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div>
       <div class="mdish">${esc(tp.names[m].n)}</div>${tp.names[m].how?`<div class="mhow">${esc(tp.names[m].how)}</div>`:''}
       <div>${its.filter(i=>!i.auto).map(fRow).join('')}</div>${its.some(i=>i.auto)?`<div class="mextra">${m==='cena'||m==='comida'?'Y de acompañamiento o postre':'Y además'}</div><div>${its.filter(i=>i.auto).map(fRow).join('')}</div>`:''}</div>`}).join('');
   return header()+`<div class="stack">
