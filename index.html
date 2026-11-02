@@ -301,7 +301,7 @@ const F={
  whey:{n:'Proteína whey',u:['cacito','cacitos'],g:30,P:24,C:2,F:1.5,cat:'lacteo'},
  yogur:{n:'Yogur natural',u:['yogur','yogures'],g:125,P:4,C:6,F:4,cat:'lacteo',step:1},
  platano:{n:'Plátano',u:['plátano','plátanos'],P:1.3,C:27,F:.4,cat:'fruta'},
- citrico:{n:'Naranja (o 2 kiwis)',u:['pieza','piezas'],P:1,C:16,F:.2,cat:'fruta'},
+ citrico:{n:'Naranja (o 2 mandarinas)',u:['pieza','piezas'],P:1,C:16,F:.2,cat:'fruta'},
  fruta:{n:'Fruta (manzana, naranja, pera)',u:['pieza','piezas'],P:.5,C:20,F:.2,cat:'fruta'},
  verdura:{n:'Verdura o ensalada',u:['puño','puños'],g:100,P:2,C:5,F:.2,cat:'fruta'},
  tostada:{n:'Tostada con tomate y aceite (bar)',u:['media tostada','medias tostadas'],P:5,C:30,F:10,cat:'fuera'},
@@ -369,7 +369,7 @@ const OPTS={
   {id:'tortitas',how:'Tortitas con crema de cacahuete y plátano; el queso batido en un bol. Sin cocinar.',n:'Tortitas con crema de cacahuete y queso batido',i:[['tortitas',4,'c'],['cacahuete',1,'f'],['batido',1,'x'],['platano',1,'x']]},
   {id:'skyrdes',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con avena, fruta y frutos secos',i:[['batido',0.75,'x'],['avena',1.5,'c'],['nueces',.5,'f'],['fruta',1,'x'],['leche',1,'x']]},
   {id:'francesa',how:'Bate los huevos y las claras en un bol de cristal y al microondas 2 min. Pan con tomate y la fruta.',n:'Tortilla de 2 huevos y claras con pan, tomate y fruta',i:[['huevo',2,'x'],['claras',.5,'x'],['pan',1.5,'c'],['aceite',.5,'f'],['fruta',1,'x'],['leche',1,'x']]},
-  {id:'batidoavena',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con avena, kiwi y nueces',i:[['batido',1,'x'],['avena',1.5,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
+  {id:'batidoavena',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con avena, fruta y nueces',i:[['batido',1,'x'],['avena',1.5,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
   {id:'aguacate',how:'Tostadas con guacamole de bote o aguacate machacado; huevos ya cocidos y pelados.',n:'Tostadas de aguacate con huevos y leche',i:[['pan',1.5,'c'],['aguacate',1,'f'],['huevo',2,'x'],['leche',1,'x']]}],
  comida:[
   {id:'polloarroz',how:'Pollo y arroz del tupper, 2 min al microondas. Brócoli congelado 5 min al microondas.',n:'Pollo con arroz y verdura',i:[['pollo',2,'x'],['arroz',2,'c'],['brocoli',1,'x'],['aceite',1,'f']]},
@@ -447,7 +447,7 @@ const SHOP={
  jamon:{s:2,n:'Jamón serrano loncheado',per:15,pack:100,pu:'sobre ~100 g'},
  pavof:{s:2,n:'Pechuga de pavo en lonchas',per:15,pack:150,pu:'sobre ~150 g'},
  platano:{s:3,n:'Plátanos',per:1,pack:1,pu:'unidad',u:'ud'},
- citrico:{s:3,n:'Naranjas (o kiwis: 2 por naranja)',per:1,pack:1,pu:'pieza',u:'ud'},
+ citrico:{s:3,n:'Naranjas (o mandarinas: 2 por naranja)',per:1,pack:1,pu:'pieza',u:'ud'},
  fruta:{s:3,n:'Manzanas, naranjas o peras',per:1,pack:1,pu:'pieza',u:'ud'},
  verdura:{s:3,n:'Verdura variada',per:100,pack:400,pu:'bolsa ~400 g'},
  ensalada:{s:3,n:'Ensalada en bolsa + tomates',per:100,pack:250,pu:'bolsa de ensalada + 2 tomates'},
@@ -940,7 +940,7 @@ function micCard(k){
       <div class="spread small muted num" style="margin-top:2px"><span>${fmt(val)} ${u}</span><span>ideal ${fmt(t)}${mx?` · máx ${fmt(mx)}`:''} ${u}</span></div></div>`};
   const low=MIC_KEYS.filter(x=>x!=='o3'&&x!=='D').filter(x=>today[x]/MIC_T[x][0]<.9);
   const high=MIC_KEYS.filter(x=>MIC_MAX[x]&&today[x]>MIC_MAX[x]);
-  const tips={fib:'Añade un puño más de verdura o una pieza de fruta.',Ca:'Un vaso de leche, un yogur o una lata de sardinas lo cubren.',Fe:'Legumbre o ternera en la comida.',Mg:'Un puñado de frutos secos o legumbre.',K:'Patata, plátano o legumbre.',vC:'Una naranja o un kiwi.',Zn:'Ternera o legumbre.'};
+  const tips={fib:'Añade un puño más de verdura o una pieza de fruta.',Ca:'Un vaso de leche, un yogur o una lata de sardinas lo cubren.',Fe:'Legumbre o ternera en la comida.',Mg:'Un puñado de frutos secos o legumbre.',K:'Patata, plátano o legumbre.',vC:'Una naranja o 2 mandarinas.',Zn:'Ternera o legumbre.'};
   return `<section class="card stack"><div class="spread"><h3>Micronutrientes</h3><span class="small muted">${logged?'lo que has apuntado':'menú de hoy'}</span></div>
     ${['fib','Ca','Fe','Mg','K','vC','Zn'].map(x=>row(x,today[x])).join('')}
     ${row('o3',wk.o3,'media semanal')}${row('D',wk.D,'media semanal')}
@@ -1399,7 +1399,7 @@ function vShop(){
         <div>• <b>Merluza, verduras:</b> ya vienen congeladas: directas al congelador.</div>
         <div>• <b>La noche antes de cocinar</b> (sábado y miércoles), pasa una bolsa de cada a la nevera.</div>
         ${days>=14?`<div>• <b>Lácteos</b> (queso batido, yogur): coge los de fecha más lejana; suelen aguantar 3-5 semanas. <b>Huevos:</b> unas 4 semanas en la nevera.</div>
-        <div>• <b>Fruta:</b> ${['platano','mix'].includes(state.settings.fruitPref)?'naranjas y kiwis aguantan 3-4 semanas en la nevera. Los plátanos: compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas, peras y kiwis aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
+        <div>• <b>Fruta:</b> ${['platano','mix'].includes(state.settings.fruitPref)?'las naranjas aguantan 3-4 semanas en la nevera. Los plátanos: compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas y peras aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
       </div></section>`:''}
     <div class="callout small">No compres nada fuera de esta lista: es justo lo que vas a comer. Lo que pone «sobran» es porque el envase es más grande de lo que necesitas; úsalo el mes siguiente. Además: sal, especias y café a tu gusto.</div>
   </div>`;
