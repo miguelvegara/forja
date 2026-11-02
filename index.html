@@ -1220,7 +1220,7 @@ function vComida(){
   const eqTxt=i=>{const e=EQ[i.f];if(!e||!F[e]||(i.f==='platano'&&state.settings.fruitPref==='platano'))return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
     return `<div class="feq">Si no tienes: <b>${esc(F[e].n)}</b> · ${esc(qtyG(F[e],q)||qtyHand(F[e],q))}${qtyG(F[e],q)?` (${esc(qtyHand(F[e],q))})`:''}</div>`};
   const fRow=i=>{const g=qtyG(F[i.f],i.q);return `<div class="frow"><span class="fn">${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span class="fq num">${esc(g||qtyHand(F[i.f],i.q))}</span>
-    ${g?`<span></span><span class="fh r">${esc(qtyHand(F[i.f],i.q))}</span>`:''}${eqTxt(i)}</div>`};
+    ${g?`<span></span><span class="fh r">${esc(qtyHand(F[i.f],i.q))}</span>`:''}</div>`};
   const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>{const its=menu.filter(i=>i.m===m),t=its.reduce((a,i)=>{const f=F[i.f];a.k+=f.k*i.q;a.P+=f.P*i.q;return a},{k:0,P:0});
     return `<div class="mblk"><div class="mhead"><span class="eyebrow">${l}${mealHour(m)?` · ${mealHour(m)}`:''}</span><span class="mtot"><span class="chip num">${nf(t.k)} kcal</span><span class="chip num">${nf(t.P)} g prot</span></span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div>
       <div class="mdish">${esc(tp.names[m].n)}</div>${tp.names[m].how?`<div class="mhow">${esc(tp.names[m].how)}</div>`:''}
@@ -1234,7 +1234,6 @@ function vComida(){
       <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
       <details><summary class="small">Cómo leer el menú</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
         <li>A la derecha, el peso para la báscula (en cocido) y debajo la medida a ojo.</li>
-        <li>«Si no tienes»: el equivalente que da lo mismo.</li>
         <li>La comida y la cena se repiten de lunes a jueves y de viernes a domingo: cocinas solo el domingo y el jueves. El desayuno y la merienda cambian cada semana.</li>
         <li>La app rota los platos sola y ajusta las cantidades a tu fase.</li>
       </ul></details>
