@@ -434,44 +434,44 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
 /* Lista de la compra: cantidad cruda por ración (per) y envase (pack) */
 const SHOP_SECS=['Carne y pescado','Huevos y lácteos','Charcutería','Fruta y verdura','Panadería','Despensa','Conservas','Otras tiendas'];
 const SHOP={
- pollo:{s:0,n:'Pechuga de pollo fileteada',per:160,pack:500,pu:'bandeja ~500 g',fr:1,cook:1},
- ternera:{s:0,n:'Filetes de ternera o lomo de cerdo',per:160,pack:400,pu:'bandeja ~400 g',fr:1,cook:1},
- salmon:{s:0,n:'Lomos de salmón',per:150,pack:250,pu:'bandeja ~250 g',fr:1,cook:1},
- merluza:{s:0,n:'Merluza o bacalao congelado',per:180,pack:600,pu:'bolsa ~600 g',cook:1},
- huevo:{s:1,n:'Huevos L',per:1,pack:12,pu:'docena',u:'ud'},
- claras:{s:1,n:'Claras de huevo líquidas',per:200,pack:500,pu:'brick ~500 ml',ml:1},
- leche:{s:1,n:'Leche semidesnatada',per:250,pack:1000,pu:'brick 1 L',ml:1},
- batido:{s:1,n:'Queso fresco batido 0%',per:250,pack:500,pu:'tarrina ~500 g'},
- skyr:{s:1,n:'Skyr o yogur proteico',per:1,pack:1,pu:'tarrina',u:'ud'},
- yogur:{s:1,n:'Yogur natural',per:1,pack:4,pu:'pack de 4',u:'ud'},
- jamon:{s:2,n:'Jamón serrano loncheado',per:15,pack:100,pu:'sobre ~100 g'},
- pavof:{s:2,n:'Pechuga de pavo en lonchas',per:15,pack:150,pu:'sobre ~150 g'},
- platano:{s:3,n:'Plátanos',per:1,pack:1,pu:'unidad',u:'ud'},
- citrico:{s:3,n:'Naranjas (o mandarinas: 2 por naranja)',per:1,pack:1,pu:'pieza',u:'ud'},
- fruta:{s:3,n:'Manzanas, naranjas o peras',per:1,pack:1,pu:'pieza',u:'ud'},
- verdura:{s:3,n:'Verdura variada',per:100,pack:400,pu:'bolsa ~400 g'},
- ensalada:{s:3,n:'Ensalada en bolsa + tomates',per:100,pack:250,pu:'bolsa de ensalada + 2 tomates'},
- brocoli:{s:3,n:'Brócoli congelado',per:100,pack:1000,pu:'bolsa ~1 kg (congelados)'},
- judias:{s:3,n:'Judías verdes congeladas',per:100,pack:1000,pu:'bolsa ~1 kg (congelados)'},
- salteado:{s:3,n:'Salteado de verduras congelado',per:100,pack:600,pu:'bolsa ~600 g (congelados)'},
- espinacas:{s:3,n:'Espinacas congeladas',per:100,pack:750,pu:'bolsa ~750 g (congelados)'},
- patata:{s:3,n:'Patatas (o bolsas para microondas) o boniatos',per:200,pack:2000,pu:'malla ~2 kg',cook:1},
- aguacate:{s:3,n:'Aguacates',per:.5,pack:1,pu:'unidad',u:'ud'},
- pan:{s:4,n:'Barra de pan',per:60,pack:250,pu:'barra ~250 g',frz:1},
- arroz:{s:5,n:'Arroz (lo cueces en olla el día de cocinar)',per:50,pack:1000,pu:'paquete 1 kg',cook:1},
- pasta:{s:5,n:'Pasta (macarrones o espaguetis)',per:60,pack:500,pu:'paquete 500 g',cook:1},
- avena:{s:5,n:'Copos de avena',per:40,pack:500,pu:'paquete ~500 g'},
- cereales:{s:5,n:'Copos de maíz',per:40,pack:500,pu:'caja ~500 g'},
- tortitas:{s:5,n:'Tortitas de maíz o arroz',per:1,pack:16,pu:'paquete ~16',u:'ud'},
- legumbre:{s:5,n:'Garbanzos o lentejas cocidos en bote de cristal',per:150,pack:250,pu:'bote (~250 g escurrido)'},
- aceite:{s:5,n:'Aceite de oliva virgen extra',per:10,pack:1000,pu:'botella 1 L',ml:1},
- nueces:{s:5,n:'Nueces o almendras naturales',per:30,pack:200,pu:'bolsa ~200 g'},
- cacahuete:{s:5,n:'Crema de cacahuete',per:15,pack:350,pu:'bote ~350 g'},
- atun:{s:6,n:'Atún al natural',per:1,pack:3,pu:'pack de 3 latas',u:'ud'},
- sardinas:{s:6,n:'Sardinas en aceite de oliva',per:1,pack:1,pu:'lata',u:'ud'},
- mejillones:{s:6,n:'Mejillones al natural',per:1,pack:1,pu:'lata',u:'ud'},
- quinoa:{s:5,n:'Quinoa',per:50,pack:500,pu:'paquete ~500 g',cook:1},
- whey:{s:7,n:'Proteína whey',per:30,pack:1000,pu:'bote 1 kg (tienda de suplementos u online)'}
+ pollo:{s:0,n:'Filetes de pechuga de pollo',d:'Nevera de carne envasada. Bandeja que pone «Filetes de pechuga de pollo». Mira el peso en la etiqueta y coge bandejas hasta sumar lo que pone aquí.',per:160,pack:500,pu:'bandeja ~500 g',fr:1,cook:1},
+ ternera:{s:0,n:'Filetes de ternera',d:'Nevera de carne envasada. Bandeja que pone «Filetes de ternera». Coge bandejas hasta sumar el peso que pone aquí.',per:160,pack:400,pu:'bandeja ~400 g',fr:1,cook:1},
+ salmon:{s:0,n:'Lomos de salmón',d:'Nevera de pescado envasado. Bandeja de 2 lomos de salmón sin piel.',per:150,pack:250,pu:'bandeja ~250 g',fr:1,cook:1},
+ merluza:{s:0,n:'Filetes de merluza congelados',d:'Arcón de congelados, zona de pescado. Bolsa de «Filetes de merluza sin piel» Hacendado (al natural, NO rebozada).',per:180,pack:600,pu:'bolsa ~600 g',cook:1},
+ huevo:{s:1,n:'Huevos L',d:'Pasillo de los huevos. Cartón de 12 huevos talla L.',per:1,pack:12,pu:'docena',u:'ud'},
+ claras:{s:1,n:'Claras de huevo pasteurizadas Hacendado',d:'Nevera junto a los huevos. Botella de 1 L de claras líquidas. Una vez abierta, gástala en pocos días.',per:200,pack:1000,pu:'botella 1 L',ml:1},
+ leche:{s:1,n:'Leche semidesnatada Hacendado',d:'Pasillo de la leche (no está en nevera). Brick de 1 L. Se vende suelto o en pack de 6.',per:250,pack:1000,pu:'brick 1 L',ml:1},
+ batido:{s:1,n:'Queso fresco batido 0% Hacendado',d:'Nevera de yogures. Tarrina blanca grande de 500 g; por dentro es como un yogur muy espeso.',per:250,pack:500,pu:'tarrina 500 g'},
+ skyr:{s:1,n:'Yogur +Proteínas natural Hacendado',d:'Nevera de yogures. Yogur natural con «+Proteínas» en el envase, sin sabores.',per:1,pack:1,pu:'yogur',u:'ud'},
+ yogur:{s:1,n:'Yogur natural Hacendado',d:'Nevera de yogures. Yogur natural normal: sin azúcar, sin sabor, que no sea griego. Se venden en packs: coge los packs que hagan falta para llegar a esta cantidad.',per:1,pack:1,pu:'yogur',u:'ud'},
+ jamon:{s:2,n:'Jamón serrano loncheado',d:'Nevera de charcutería envasada. Sobre de lonchas.',per:15,pack:100,pu:'sobre ~100 g'},
+ pavof:{s:2,n:'Pechuga de pavo en lonchas',d:'Nevera de charcutería envasada. Sobre que pone «Pechuga de pavo», mejor la de más % de pavo.',per:15,pack:150,pu:'sobre ~150 g'},
+ platano:{s:3,n:'Plátanos',d:'Fruta, a granel. Si compras para más de una semana: la mitad verdes y la mitad amarillos.',per:1,pack:1,pu:'unidad',u:'ud'},
+ citrico:{s:3,n:'Naranjas',d:'Fruta. Malla o sueltas, las de mesa (no las de zumo).',per:1,pack:1,pu:'pieza',u:'ud'},
+ fruta:{s:3,n:'Manzanas',d:'Fruta. Las que más te gusten, sueltas o en bolsa.',per:1,pack:1,pu:'pieza',u:'ud'},
+ verdura:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
+ ensalada:{s:3,n:'Ensalada 4 estaciones + tomates',d:'Fruta y verdura, nevera de bolsas. Bolsa «4 estaciones» (o cualquier ensalada en bolsa ya lavada) y 2 tomates por bolsa. Coge las de fecha más lejana.',per:100,pack:250,pu:'bolsa + 2 tomates'},
+ brocoli:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
+ judias:{s:3,n:'Judías verdes congeladas',d:'Arcón de congelados, zona de verduras. Bolsa de judías verdes troceadas.',per:100,pack:1000,pu:'bolsa ~1 kg'},
+ salteado:{s:3,n:'Salteado de verduras congelado',d:'Arcón de congelados, zona de verduras. Bolsa de verduras salteadas SIN arroz ni pasta.',per:100,pack:600,pu:'bolsa ~600 g'},
+ espinacas:{s:3,n:'Espinacas congeladas',d:'Arcón de congelados, zona de verduras. Bolsa de espinacas en hoja o en porciones.',per:100,pack:750,pu:'bolsa ~750 g'},
+ patata:{s:3,n:'Patatas para microondas',d:'Fruta y verdura. Bolsa de patatas pequeñas «para microondas»: se hacen en la misma bolsa en 8 min.',per:200,pack:500,pu:'bolsa ~500 g',cook:1},
+ aguacate:{s:3,n:'Aguacates',d:'Fruta. Que ceda un poco al apretar con el dedo (está maduro). Si es para dentro de unos días, cógelo duro.',per:.5,pack:1,pu:'unidad',u:'ud'},
+ pan:{s:4,n:'Barra de pan',d:'Panadería. Barra normal o rústica.',per:60,pack:250,pu:'barra ~250 g',frz:1},
+ arroz:{s:5,n:'Arroz redondo Hacendado',d:'Pasillo de arroz y pasta. Paquete de 1 kg (lo cueces en olla el día de cocinar).',per:50,pack:1000,pu:'paquete 1 kg',cook:1},
+ pasta:{s:5,n:'Macarrones Hacendado',d:'Pasillo de arroz y pasta. Paquete de 500 g.',per:60,pack:500,pu:'paquete 500 g',cook:1},
+ avena:{s:5,n:'Copos de avena Hacendado',d:'Pasillo de los cereales. Bolsa de copos de avena normales (sin sabores).',per:40,pack:500,pu:'bolsa ~500 g'},
+ cereales:{s:5,n:'Copos de maíz Hacendado',d:'Pasillo de los cereales. Caja de copos de maíz normales (sin chocolate ni miel).',per:40,pack:500,pu:'caja ~500 g'},
+ tortitas:{s:5,n:'Tortitas de maíz Hacendado',d:'Pasillo de los cereales/galletas. Paquete de tortitas finas de maíz.',per:1,pack:16,pu:'paquete ~16',u:'ud'},
+ legumbre:{s:5,n:'Garbanzos cocidos en bote',d:'Pasillo de conservas/legumbres. Bote de cristal de garbanzos ya cocidos: se escurren y listos.',per:150,pack:250,pu:'bote (~250 g escurrido)'},
+ aceite:{s:5,n:'Aceite de oliva virgen extra Hacendado',d:'Pasillo del aceite. Botella de 1 L.',per:10,pack:1000,pu:'botella 1 L',ml:1},
+ nueces:{s:5,n:'Nueces peladas naturales',d:'Pasillo de frutos secos. Bolsa de nueces peladas, sin sal.',per:30,pack:200,pu:'bolsa ~200 g'},
+ cacahuete:{s:5,n:'Crema de cacahuete 100 %',d:'Pasillo de las cremas de untar. Bote que solo lleve cacahuete.',per:15,pack:350,pu:'bote ~350 g'},
+ atun:{s:6,n:'Atún al natural Hacendado',d:'Pasillo de conservas. Pack de 3 latas «al natural» (no en aceite).',per:1,pack:3,pu:'pack de 3 latas',u:'ud'},
+ sardinas:{s:6,n:'Sardinas en aceite de oliva Hacendado',d:'Pasillo de conservas. Lata pequeña de sardinas en aceite de oliva.',per:1,pack:1,pu:'lata',u:'ud'},
+ mejillones:{s:6,n:'Mejillones al natural',d:'Pasillo de conservas. Lata de mejillones al natural (no en escabeche).',per:1,pack:1,pu:'lata',u:'ud'},
+ quinoa:{s:5,n:'Quinoa',d:'',per:50,pack:500,pu:'paquete ~500 g',cook:1},
+ whey:{s:7,n:'Proteína whey',d:'No la hay en Mercadona: tienda de suplementos u online. Sabor que te guste.',per:30,pack:1000,pu:'bote 1 kg'}
 };
 
 /* ================= RUTINA EN V ================= */
@@ -1382,7 +1382,8 @@ function vShop(){
     return `<section class="card"><div class="eyebrow">${sec}</div>${its.map(x=>`<div class="fitem" style="${done[x.f]?'opacity:.45':''}">
       <div class="nm" style="${done[x.f]?'text-decoration:line-through':''}">${esc(x.s.n)}${(x.s.fr||x.s.frz)&&days>4?' <span class="unit">congelar</span>':''}</div>
       <div class="acts"><button class="done ${done[x.f]?'on':''}" data-a="shop-tick" data-v="${x.f}" aria-label="Marcar ${esc(x.s.n)}">${ICON.check}</button></div>
-      <div class="q"><b class="num" style="color:var(--ink)">${x.s.u==='ud'&&x.s.pack===1?nf(x.packs)+' '+esc(x.packs>1?(x.s.pu==='unidad'?'unidades':x.s.pu+'s'):x.s.pu):nf(x.packs)+' × '+esc(x.s.pu)}</b> · necesitas ${amtText(x)}${x.left?` · <span style="color:var(--warn)">sobran ~${amtText({s:x.s,amt:x.left})}</span>`:''}</div>
+      <div class="q"><b class="num" style="color:var(--ink)">${x.s.u==='ud'&&x.s.pack===1?nf(x.packs)+' '+esc(x.packs>1?(x.s.pu==='unidad'?'unidades':x.s.pu==='yogur'?'yogures':x.s.pu+'s'):x.s.pu):nf(x.packs)+' × '+esc(x.s.pu)}</b> · necesitas ${amtText(x)}${x.left?` · <span style="color:var(--warn)">sobran ~${amtText({s:x.s,amt:x.left})}</span>`:''}</div>
+      ${x.s.d?`<div class="small muted" style="grid-column:1/-1">${esc(x.s.d)}</div>`:''}
     </div>`).join('')}</section>`;
   }).join('');
   return header()+`<div class="stack">
