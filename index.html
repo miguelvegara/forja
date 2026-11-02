@@ -349,7 +349,7 @@ const GROUPS={
  veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','judias','salteado','espinacas','verdura']}
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
-const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'salmon',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
+const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
  arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'quinoa',quinoa:'arroz',pan:'avena',avena:'pan',tortitas:'pan',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'skyr',yogur:'skyr',
  fruta:'platano',platano:'fruta',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
@@ -375,7 +375,7 @@ const OPTS={
   {id:'pavopasta',how:'Pasta 10 min; en la sartén, carne picada de pavo con tomate triturado y el salteado de verduras 10 min.',n:'Pasta boloñesa de pavo',i:[['pollo',2,'x'],['pasta',2,'c'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'legumbrepollo',how:'Bote de garbanzos o lentejas enjuagado a la sartén con el pollo en tiras y espinacas congeladas, 8 min.',n:'Garbanzos o lentejas con pollo',i:[['legumbre',2,'c'],['pollo',1.5,'x'],['espinacas',1,'x'],['aceite',1,'f']]},
   {id:'pavopatata',how:'Patatas en bolsa de microondas 8 min, pavo a la plancha y judías verdes congeladas al microondas.',n:'Pavo con patata o boniato al horno',i:[['pollo',2,'x'],['patata',2,'c'],['judias',1,'x'],['aceite',1,'f']]},
-  {id:'salmonarroz',how:'Salmón congelado al horno o freidora de aire 15 min, arroz de la tanda y ensalada de bolsa.',n:'Salmón con arroz',i:[['salmon',1.5,'x'],['arroz',2,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
+  {id:'salmonarroz',how:'Abre una lata de sardinas, pollo de la tanda en tiras, arroz de la tanda y ensalada de bolsa. Sin sartén.',n:'Arroz con sardinas y pollo',i:[['sardinas',1,'x'],['pollo',1,'p'],['arroz',2,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
   {id:'lentejasarroz',how:'Lentejas de bote enjuagadas, calientes con el salteado de verduras y pollo en tiras; arroz de la tanda y 1 huevo cocido.',n:'Lentejas con arroz, pollo y huevo',i:[['legumbre',2,'c'],['arroz',1,'c'],['huevo',1,'x'],['pollo',1,'p'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'currypollo',how:'Pollo en tiras a la sartén con el salteado de verduras y una cucharadita de curry; arroz basmati de la tanda.',n:'Pollo al curry con arroz basmati',i:[['pollo',2,'x'],['arroz',2,'c'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'garbanzos',how:'Garbanzos de bote enjuagados con espinacas a la sartén 5 min, pollo a la plancha y un huevo cocido.',n:'Garbanzos con espinacas, pollo y huevo',i:[['legumbre',2,'c'],['pollo',1,'x'],['huevo',1,'x'],['espinacas',1.5,'x'],['aceite',1,'f']]},
@@ -395,7 +395,6 @@ const OPTS={
   {id:'yogurcereal',how:'Sin cocinar.',n:'Yogur con cereales y frutos secos',i:[['yogur',2,'x'],['cereales',1,'c'],['nueces',.5,'f']]}],
  cena:[
   {id:'merluza',how:'Merluza congelada al microondas o al horno, patatas de microondas, judías verdes al microondas y 1 huevo cocido.',fish:1,n:'Merluza con patata y huevo',i:[['huevo',1,'x'],['merluza',1,'p'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f']]},
-  {id:'salmon',how:'Salmón al horno o freidora de aire 15 min con patatas de microondas y brócoli al microondas.',fish:1,n:'Salmón con patata y verdura',i:[['salmon',1,'p'],['patata',2,'c'],['brocoli',1,'x']]},
   {id:'tortilla',how:'Patata de microondas en dados a la sartén con 2 huevos y las claras, 5 min; ensalada de bolsa.',n:'Tortilla de patata casera con ensalada',i:[['huevo',2,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1,'x'],['aceite',1,'f']]},
   {id:'pollocena',how:'Pollo a la plancha, boniato o patata al microondas 8 min y brócoli congelado.',n:'Pollo a la plancha con boniato',i:[['pollo',1.5,'p'],['patata',2,'c'],['brocoli',1,'x'],['aceite',.5,'f']]},
   {id:'burger',how:'Pechuga de pollo o pavo picada (sin aditivos), en forma de hamburguesa a la plancha 8 min, en pan, con ensalada y tomate.',n:'Hamburguesa de pollo casera con pan y ensalada',i:[['pollo',1.5,'p'],['pan',1.5,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
@@ -883,7 +882,7 @@ function cadenceTxt(x){const c=cad();return x<c.a-5?'Suave: acelera un poco':x<=
 function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
 
 /* ================= MENÚ ================= */
-/* Cada día cubre fibra y calcio: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
+/* Cada día cubre fibra, calcio, zinc y omega-3: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
 function buildMenu(tp){
   let items=buildMenuCore(tp,[]);
   for(let pass=0;pass<2;pass++){
@@ -892,6 +891,7 @@ function buildMenu(tp){
     const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca;
     if(cGap>0)extra.push([snack,'yogur',Math.min(3,Math.ceil(cGap/180))]);
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
+    if(mi.o3<200&&pass===0)extra.push([snack,'sardinas',.5]); /* omega-3: media lata de sardinas los días sin pescado azul */
     if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
     if(!extra.length)break;
     tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
@@ -1246,7 +1246,7 @@ const LIMITS=[
  {id:'alc',n:'Alcohol',max:4,u:'cañas',f:{cerveza:1},why:'Cuanto menos, mejor: quita sueño, músculo y marca la cara.'},
  {id:'azu',n:'Refrescos con azúcar',max:2,u:'latas',f:{refresco:1},why:'Una lata ya es casi todo el azúcar libre recomendado para un día.'},
  {id:'huevos',n:'Huevos',max:21,u:'a la semana (3 al día)',f:{huevo:1},why:'Hasta 3 al día no suben el colesterol en la mayoría de personas sanas. Más, mejor comprobarlo en la analítica.'},
- {id:'purinas',n:'Sardinas y mejillones',max:4,u:'latas',f:{sardinas:1,mejillones:1},why:'Son muy sanos, pero tienen purinas: en exceso suben el ácido úrico.'},
+ {id:'purinas',n:'Sardinas y mejillones',max:7,u:'latas (1 al día)',f:{sardinas:1,mejillones:1},why:'Son muy sanos, pero tienen purinas: más de una lata al día de media puede subir el ácido úrico. Míralo en la analítica anual.'},
  {id:'satur',n:'Queso curado y embutido',max:7,u:'raciones',f:{queso:1,jamon:1/3,pavof:1/3},why:'Grasa saturada y sal: en exceso suben el colesterol LDL y la tensión.'}
 ];
 const FISH={salmon:1,merluza:1,atun:1,sardinas:1,mejillones:1};
