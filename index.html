@@ -391,7 +391,7 @@ const OPTS={
   {id:'merluzacom',how:'Pollo del tupper 2 min al microondas; patatas de microondas 8 min; ensalada 4 estaciones.',n:'Pollo con patatas y ensalada',i:[['pollo',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',1,'f']]},
   {id:'quinoapollo',how:'Patatas de microondas (8 min en su bolsa), pollo del tupper, medio aguacate en dados y ensalada 4 estaciones en un bol.',n:'Bol de patata con pollo, aguacate y ensalada',i:[['pollo',2,'x'],['patata',2,'c'],['aguacate',.5,'x'],['ensalada',1.5,'x'],['aceite',.5,'f']]}],
  merienda:[
-  {id:'batido',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con nueces y fruta',i:[['batido',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
+  {id:'batido',how:'Todo en un bol: el queso batido, el plátano en rodajas y las nueces por encima. Sin cocinar.',n:'Queso batido con plátano y nueces',i:[['batido',1,'x'],['nueces',1,'f'],['fruta',1,'x']]},
   {id:'bocata',how:'Pollo del tupper en pan con tomate. Sin cocinar.',n:'Bocadillo de pollo con tomate',i:[['pan',1.5,'c'],['pollo',1,'x'],['fruta',1,'x'],['aceite',.5,'f']]},
   {id:'huevospan',how:'Huevos cocidos ya pelados, pan, fruta y un yogur. Sin cocinar.',n:'Huevos cocidos con pan, fruta y un yogur',i:[['huevo',2,'x'],['pan',1,'c'],['fruta',1,'x'],['nueces',.5,'f'],['yogur',1,'x']]},
   {id:'skyrmer',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con cereales y fruta',i:[['batido',0.75,'x'],['cereales',1,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
@@ -421,8 +421,17 @@ function blockOf(k){
   const m=monday(k),wn=Math.round((pk(m)-pk('2026-10-26'))/(7*864e5)),dow=(pk(k).getDay()+6)%7,half=dow<=3?0:1;
   return{wn,b:wn*2+half,key:m+(half?'b':'a'),start:half?add(m,4):m,len:half?3:4};
 }
+/* Plan simple mediterráneo: desayuno y merienda fijos; comida y cena cambian cada semana (lun-jue / vie-dom) */
+const SIMPLE={desayuno:[['tostadas'],['tostadas']],merienda:[['batido'],['batido']],
+  comida:[['currypollo','polloarroz','pavopasta','pavopatata'],['legumbrepollo','lentejasarroz','garbanzos']],
+  cena:[['sardinascena','atunpasta','mejillones'],['pollocena','pastapollo','merluza','burger']]};
+const SIMPLE_FROM='2026-11-09';
 function optFor(k,meal){
   const bl=blockOf(k),list=OPTS[meal],ex=(state.settings.mex||{})[meal]||[];
+  if(state.settings.simple!==false&&k>=SIMPLE_FROM&&SIMPLE[meal]){
+    const ids=SIMPLE[meal][bl.len===4?0:1].filter(id=>!ex.includes(id)),pool=(ids.length?ids:SIMPLE[meal][bl.len===4?0:1]).map(id=>list.find(o=>o.id===id)).filter(Boolean);
+    const shift=((state.settings.mswap||{})[bl.key+'|'+meal])||0;
+    if(pool.length)return pool[((bl.wn+shift)%pool.length+pool.length)%pool.length]}
   let src=list,base=(meal==='desayuno'||meal==='merienda')?bl.wn:bl.b;
   if(meal==='recena')base=bl.wn;
   if(meal==='cena'){const half=bl.b%2;src=list.filter(o=>!!o.fish===!!half);base=bl.wn}
@@ -434,8 +443,10 @@ function optFor(k,meal){
   return pool[i];
 }
 function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k,ml);m[ml]=o.i;names[ml]=o});
-  if(state.settings.mode==='cut'&&m.cena)m.cena=[...m.cena,['batido',.75,'x']];
-  if(state.settings.mode==='cut'&&m.comida)m.comida=[...m.comida,['ensalada',1,'x'],['fruta',1,'x']];
+  const simp=state.settings.simple!==false&&k>=SIMPLE_FROM;
+  if(state.settings.mode==='cut'&&m.cena&&!simp)m.cena=[...m.cena,['batido',.75,'x']];
+  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['brocoli',1,'x']]; /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
+  if(state.settings.mode==='cut'&&m.comida)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
     for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','brocoli','espinacas'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
@@ -945,8 +956,8 @@ function buildMenu(tp){
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
     if(mi.o3<200&&pass===0&&(!tp.k||pk(tp.k).getDate()%2===0))extra.push([post,'sardinas',1]); /* lata entera en días alternos */ /* omega-3: media lata de sardinas los días sin pescado azul */
     const ban=state.settings.fruitPref==='platano'||state.settings.fruitPref==='mix',vGap=MIC_T.vC[0]*.97-mi.vC;
-    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['brocoli','judias','espinacas'].find(v=>!dv.has(v))||'brocoli',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([snack,'fruta',fq])}
-    else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
+    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['brocoli','judias','espinacas'].find(v=>!dv.has(v))||'brocoli',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fq])}
+    else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
     if(!extra.length)break;
     tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
   }
@@ -1238,7 +1249,7 @@ function vComida(){
       <div class="kpis"><div class="kpi"><b class="num">${mealPlan().length}</b><span>comidas</span></div><div class="kpi"><b class="num">${nf(mt.k)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${nf(mt.P)} g</b><span>proteína</span></div></div>
       <details><summary class="small">Cómo leer el menú</summary><ul class="small muted" style="margin:6px 0 0;padding-left:18px;display:grid;gap:4px">
         <li>A la derecha, el peso para la báscula (en cocido) y debajo la medida a ojo.</li>
-        <li>La comida y la cena se repiten de lunes a jueves y de viernes a domingo: cocinas solo el domingo y el jueves. El desayuno y la merienda cambian cada semana.</li>
+        <li>La comida y la cena se repiten de lunes a jueves y de viernes a domingo: cocinas solo el domingo y el jueves. ${state.settings.simple!==false?'El desayuno y la merienda son siempre los mismos; la comida y la cena cambian cada semana (ciclo de 12 semanas).':'El desayuno y la merienda cambian cada semana.'}</li>
         <li>La app rota los platos sola y ajusta las cantidades a tu fase.</li>
       </ul></details>
       <div>${menuHtml}</div>
