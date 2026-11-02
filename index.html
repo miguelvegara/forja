@@ -455,7 +455,7 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
   /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
   if(trainsOn(k)&&m.merienda)m.merienda=[...m.merienda,['platano',1,'x']];
   return{m,names,k}}
-function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]||t==='walk'}
+function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]}
 /* Horario del día, calculado desde la hora de entreno */
 const toMin=t=>{const[a,b]=String(t||'20:00').split(':').map(Number);return (a||0)*60+(b||0)};
 const toHM=x=>{x=((Math.round(x/5)*5)%1440+1440)%1440;return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};
@@ -640,7 +640,7 @@ function rebuildRoutine(){
     ROUTINE[k]={n:R.n,focus:g&&LEGDAYS.includes(k)?R.focus.replace('Cuádriceps','Glúteo, cuádriceps').replace(/^Pierna/,'Glúteo, pierna'):R.focus,ex};
   }
 }
-const TYPES={fbA:'Cuerpo completo A',fbB:'Cuerpo completo B',fbC:'Cuerpo completo C',hombroX:'Hombro extra',gluteX:'Glúteo extra',torsoA:'Torso A',piernaA:'Pierna A',torsoB:'Torso B',piernaB:'Pierna B',walk:'Caminata',rest:'Descanso'};
+const TYPES={fbA:'Cuerpo completo A',fbB:'Cuerpo completo B',fbC:'Cuerpo completo C',hombroX:'Hombro extra',gluteX:'Glúteo extra',torsoA:'Torso A',piernaA:'Pierna A',torsoB:'Torso B',piernaB:'Pierna B',walk:'Sin gym',rest:'Descanso'};
 const DOW={1:'torsoA',2:'piernaA',3:'walk',4:'torsoB',5:'piernaB',6:'walk',0:'walk'};
 const DAYNAMES=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MAIN_LIFTS=[['pressInc','Press inclinado'],['jalon','Jalón al pecho'],['pressHombro','Press de hombro'],['lateral','Elevaciones laterales'],['hackA','Sentadilla hack'],['rumano','Peso muerto rumano']];
@@ -934,7 +934,7 @@ function suggest(ex,k){
   return{kg:top,txt:`Última vez ${kgs(top)} kg: ${last}. Mismo peso, busca +1 rep.`};
 }
 function liftMin(R){return Math.round(8+R.ex.reduce((a,e)=>a+e[2]*(e[5]+45),0)/60)}
-function cintaMin(R){const s=state.settings;const c=(s.walkMin||80)-(s.commute||0)-liftMin(R);return c>=5?Math.round(c/5)*5:0}
+function cintaMin(R){return 0} /* sin cinta: los pasos los controla él */
 function sessionMin(R){return liftMin(R)}
 function dayTotalMin(R){const s=state.settings;return R?(s.commute||0)+liftMin(R)+cintaMin(R):(s.walkMin||80)}
 /* Pasos: media de 10.000 al día. Los días de gym salen menos y los de caminata más. */
@@ -945,6 +945,10 @@ function walkPlan(k=ui.cur){const tgt=stepTarget(k),st=Math.max(2000,tgt-LIFE_ST
 function cadenceTxt(x){const c=cad();return x<c.a-5?'Suave: acelera un poco':x<=c.b+5?'Ritmo ideal':'Rápido: también vale'}
 /* Meta de pasos: la misma todos los días, editable en Plan. */
 function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
+function stepsWeek(k=ui.cur){const m=monday(k),v=[];for(let i=0;i<7;i++){const dk2=add(m,i);if(dk2>TODAY)break;const d=peek(dk2);if(d&&d.steps>0)v.push(d.steps)}return{n:v.length,avg:v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}}
+function stepsCard(){const t=stepTarget(),w=stepsWeek();return `<section class="card stack"><div class="spread"><h2>Pasos</h2><span class="chip num">${th(t*7)} a la semana</span></div>
+  <div class="kpis"><div class="kpi"><b class="num">${th(t)}</b><span>media ideal al día</span></div><div class="kpi"><b class="num" style="color:${w.avg==null?'inherit':w.avg>=t?'var(--ok)':'var(--warn)'}">${w.avg!=null?th(w.avg):'—'}</b><span>tu media esta semana${w.n?' ('+w.n+' d)':''}</span></div></div>
+  <p class="muted small" style="margin:0">Como tú quieras: lo que cuenta es la media de la semana. Apunta los pasos de cada día en Hoy.</p></section>`}
 
 /* ================= MENÚ ================= */
 /* Cada día cubre fibra, calcio, zinc y omega-3: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
@@ -1029,7 +1033,7 @@ function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return fa
 const HAB=[
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
  {k:'prot',n:'Llegar a tu proteína',auto:(d,k)=>totals(k).P>=targets().P*.95},
- {k:'move',n:'Entreno o caminata hechos',auto:(d,k)=>moved(d,k)},
+ {k:'move',n:'Entreno hecho o pasos del día',auto:(d,k)=>moved(d,k)},
  {k:'steps',n:'Pasos del día',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
  {k:'crea',n:'Creatina (5 g)'},
  {k:'sol',n:'10 min de luz de sol al levantarte'},
@@ -1117,11 +1121,7 @@ function vHoy(){
       <p class="muted small" style="margin:0">${esc(R.focus)} · ${dayTotalMin(R)} min: ${state.settings.commute||0} de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''}${isDeload()?' · <b>semana de descarga</b>':''}</p>
       <button class="btn primary block" data-a="tab" data-v="entreno">${doneSets?'Seguir con el entreno':'Empezar entreno'}</button></section>`;
   }else if(type==='walk'){
-    const w=d.walk;
-    session=`<section class="card stack"><div class="spread"><h2>Caminata</h2><span class="chip ${w?'on':''}">${w?(w.steps?th(w.steps)+' pasos':nf(w.min)+' min'):'Pendiente'}</span></div>
-      ${(()=>{const wp=walkPlan();return `<div class="kpis"><div class="kpi"><b class="num">${th(wp.steps)}</b><span>pasos de caminata</span></div><div class="kpi"><b class="num">${cad().a}-${cad().b}</b><span>pasos por minuto</span></div><div class="kpi"><b class="num">${nf(wp.km,1)}</b><span>km · ~${wp.min} min</span></div></div>
-      <p class="muted small" style="margin:0">Meta del día: ${th(wp.tgt)} pasos contando los de tu día normal. Ritmo ideal: paso ligero, unos ${nf(wp.kmh,1)} km/h a tu altura. Puedes hablar, pero no cantar.</p>`})()}
-      ${w?`<button class="btn block" data-a="tab" data-v="entreno">Editar caminata</button>`:`<button class="btn primary block" data-a="walk-quick">Hecha</button>`}</section>`;
+    session=stepsCard();
   }else session=`<section class="card"><h2>Descanso</h2><p class="muted small" style="margin:6px 0 0">Come igual que siempre: el músculo crece hoy.</p></section>`;
   const hasFood=(d.foods||[]).length>0;
   const prevW=weights().filter(([k])=>k<ui.cur).pop();
@@ -1511,18 +1511,10 @@ function vEntreno(){
           <p class="small muted" style="margin:0">El cambio vale para todas las sesiones. El historial de cada variante se guarda por separado.</p></div>`:''}
       </section>`;
     });
-    html+=`<section class="card flat small muted">Con el cuello empieza muy ligero (2,5-5 kg) y movimiento lento: nada de tirones. Antes de irte del gym mira tus pasos: la meta de hoy son ${th(stepTarget())}. Si te faltan al final del día, paseo de 10-15 min tras comer o cenar.</section>`;
+    html+=`<section class="card flat small muted">Con el cuello empieza muy ligero (2,5-5 kg) y movimiento lento: nada de tirones.</section>`;
     if(cintaMin(R))html+=`<section class="card stack"><div class="spread"><h3>Cinta inclinada · ${cintaMin(R)} min</h3><button class="toggle ${d.cinta?'on':''}" data-a="cinta" aria-pressed="${!!d.cinta}" aria-label="Cinta hecha"></button></div><p class="small muted" style="margin:0">Al acabar las pesas, para completar tus ${state.settings.walkMin} min de hoy. Inclinación 8-12 %, unos 5 km/h, sin agarrarte.</p></section>`;
   }
-  if(!R||ui.showWalk||d.walk){
-    const wp=walkPlan();const w=d.walk||{steps:wp.steps,min:wp.min};const ws=w.steps||Math.round((w.min||0)*110);const cadN=w.min?ws/w.min:110;const km=ws*stride()/1000;
-    html+=`<section class="card stack"><div class="spread"><h2>Caminata</h2>${d.walk?`<span class="chip on">Hecha</span>`:''}</div>
-      <div class="callout small">Hoy: <b>${th(wp.steps)} pasos</b> caminando (meta del día ${th(wp.tgt)}). Ritmo ideal: <b>${cad().a}-${cad().b} pasos por minuto</b>, unos ${nf(wp.kmh,1)} km/h a tu altura. Para comprobarlo, cuenta tus pasos 15 segundos: entre ${Math.round(cad().a/4)} y ${Math.round(cad().b/4)} es perfecto.</div>
-      <div class="grid2"><div class="field"><label for="wst">Pasos de la caminata</label><input class="inp" id="wst" inputmode="numeric" data-walk="steps" value="${ws}"></div>
-      <div class="field"><label for="wm">Minutos (aprox.)</label><input class="inp" id="wm" inputmode="numeric" data-walk="min" value="${w.min||''}"></div></div>
-      <div class="spread small"><span class="muted">${nf(km,1)} km · ≈ ${nf(Math.round(.55*curWeight()*km))} kcal</span><b style="color:${cadN>=cad().a-5?'var(--ok)':'var(--warn)'}">${Math.round(cadN)} pasos/min · ${cadenceTxt(cadN)}</b></div>
-      ${d.walk?`<button class="btn" data-a="walk-del">Quitar caminata</button>`:`<button class="btn primary" data-a="walk-save">Guardar caminata</button>`}</section>`;
-  }else html+=`<button class="btn ghost" data-a="show-walk">+ Apuntar también una caminata</button>`;
+  if(!R)html+=stepsCard();
   if(type==='rest')html=`<section class="card"><h2>Descanso</h2><p class="muted small" style="margin:6px 0 0">Hoy no toca nada.</p></section>`+html;
   return header()+`<div class="stack">${typeSel}${html}</div>`;
 }
@@ -1617,11 +1609,11 @@ function vProgreso(){
 function vPlan(){
   const s=state.settings,tg=targets(),rec=phaseRec();
   const order=[1,2,3,4,5,6,0];
-  const week=order.map(i=>{const t=planType(i),R=ROUTINE[t];return `<div class="spread" style="padding:8px 0;border-top:1px solid var(--line)"><span><b>${DAYNAMES[i]}</b> <span class="muted small">· ${R?esc(R.n):t==='walk'?'Caminata':'Descanso'}</span></span><span class="small muted num">${th(s.steps)} pasos · ${R?dayTotalMin(R)+' min':'~'+walkPlan().min+' min andando'}</span></div>`}).join('');
+  const week=order.map(i=>{const t=planType(i),R=ROUTINE[t];return `<div class="spread" style="padding:8px 0;border-top:1px solid var(--line)"><span><b>${DAYNAMES[i]}</b> <span class="muted small">· ${R?esc(R.n):t==='walk'?'Sin gym':'Descanso'}</span></span><span class="small muted num">${th(s.steps)} pasos · ${R?dayTotalMin(R)+' min':'~'+walkPlan().min+' min andando'}</span></div>`}).join('');
   return header()+`<div class="stack">
     <section class="card stack"><h2>Tu semana</h2>
       <div>${week}</div>
-      <p class="small muted" style="margin:0">Cada día ${s.walkMin} min de entreno. Los días de gym: ${s.commute} min andando de ida y vuelta, las pesas y, si sobra tiempo, cinta inclinada. Los demás días: caminata de unos ${th(walkPlan(add(monday(TODAY),2)).steps)} pasos a 100-120 pasos por minuto (paso ligero, unos ${nf(walkPlan().kmh,1)} km/h a tu altura). Pasos: ${th(s.steps)} cada día, sea de gym o de caminata, a ${cad().a}-${cad().b} pasos por minuto cuando caminas. Los días de gym, si te faltan al final del día, da un paseo de 10-15 min después de comer o cenar. Es lo mínimo que da casi todo el resultado y se puede mantener toda la vida. Si un día no puedes ir, haz esa sesión al día siguiente en lugar de la caminata. Cada 6 semanas hay una semana de descarga y la app te avisa.</p>
+      <p class="small muted" style="margin:0">Gym 4 días; el resto, libre. Pasos: media de ${th(s.steps)} al día (${th(s.steps*7)} a la semana), como tú prefieras. Es lo mínimo que da casi todo el resultado y se puede mantener toda la vida. Si un día no puedes ir, haz esa sesión al día siguiente. Cada 6 semanas hay una semana de descarga y la app te avisa.</p>
       <details><summary>Por qué esta rutina</summary><div class="small" style="display:grid;gap:8px;margin-top:8px">
         ${state.settings.focus==='glute'?`<p style="margin:0">Enfoque glúteo y cintura: glúteo en cada día de pierna (hip thrust y abductores), espalda y hombro para que la cintura se vea más estrecha por contraste, y el resto del cuerpo completo para estar fuerte y proporcionada.</p>`
         :`<p style="margin:0">Enfoque en V: hombros y espalda anchos con cintura estrecha, lo que más se ve con ropa. El hombro lateral se entrena todos los días de pesas, espalda y pecho alto 2 veces por semana, y la pierna completa sin pasarse.</p>`}
@@ -1642,7 +1634,7 @@ function vPlan(){
       <p style="margin:0"><b>Siempre:</b> 10.000 pasos, dormir 7,5 h o más, proteína y entrenar con 1-2 repeticiones en reserva. Ese es el 20 % que da el 80 % durante toda la vida.</p>
     </div></details></section>
     <section class="card"><details><summary>Si pasa algo</summary><div class="small" style="display:grid;gap:8px;margin-top:10px">
-      <p style="margin:0"><b>No puedes ir un día:</b> haz esa sesión al día siguiente en lugar de la caminata. Si pierdes la semana, sigue donde lo dejaste.</p>
+      <p style="margin:0"><b>No puedes ir un día:</b> haz esa sesión al día siguiente. Si pierdes la semana, sigue donde lo dejaste.</p>
       <p style="margin:0"><b>Viaje o vacaciones:</b> camina 12.000-15.000 pasos al día y come proteína en cada comida. Si hay gym, haz las dos primeras sesiones de tu semana. Una o dos semanas fuera no te quitan músculo.</p>
       <p style="margin:0"><b>Te duele algo al entrenar:</b> cambia el ejercicio por su alternativa (botón «Cambiar»). Si el dolor dura más de 2 semanas, ve al fisio.</p>
       <p style="margin:0"><b>Enfermo:</b> descansa hasta estar bien y vuelve con los mismos pesos. La fuerza vuelve en 1-2 semanas.</p>
@@ -1663,7 +1655,7 @@ function vPlan(){
     <section class="card stack"><h2>Objetivos diarios</h2>
       <div class="kpis"><div class="kpi"><b class="num">${nf(tg.kcal)}</b><span>kcal</span></div><div class="kpi"><b class="num" style="color:var(--p)">${tg.P} g</b><span>proteína</span></div><div class="kpi"><b class="num">${nf(s.steps)}</b><span>pasos</span></div></div>
       <div class="kpis"><div class="kpi"><b class="num" style="color:var(--c)">${tg.C} g</b><span>hidratos</span></div><div class="kpi"><b class="num" style="color:var(--f)">${tg.F} g</b><span>grasa</span></div><div class="kpi"><b class="num">${nf(tg.tdee)}</b><span>gasto medio</span></div></div>
-      <p class="small muted" style="margin:0">Mismas calorías todos los días: los entrenos y las caminatas ya están repartidos en la media de la semana.${s.off?` Incluye un ajuste de ${s.off>0?'+':''}${s.off} kcal por cómo responde tu peso.`:''}</p>
+      <p class="small muted" style="margin:0">Mismas calorías todos los días: los entrenos y los pasos ya están repartidos en la media de la semana.${s.off?` Incluye un ajuste de ${s.off>0?'+':''}${s.off} kcal por cómo responde tu peso.`:''}</p>
     </section>
     <section class="card stack"><h3>Tus datos</h3>
       <div class="grid2">
@@ -1871,7 +1863,7 @@ function vOnb(){
     <div class="field"><label>Días de pesas a la semana</label><div class="seg">${[3,4,5].map(n=>`<button data-a="onb-set" data-k="days" data-v="${n}" data-n="1" class="${d.days===n?'on':''}">${n} días</button>`).join('')}</div>
       <span class="small muted">${d.days===3?'Cuerpo completo 3 veces. Ideal si vas justo de tiempo.':d.days===4?'Torso y pierna 2 veces cada uno. Lo más equilibrado para casi todos.':'4 días más uno extra para lo que quieres destacar.'} Los demás días toca caminar.</span></div>
     <div class="field"><label>Minutos de entreno al día</label><div class="seg">${[45,60,80,100].map(n=>`<button data-a="onb-set" data-k="min" data-v="${n}" data-n="1" class="${d.min===n?'on':''}">${n}</button>`).join('')}</div>
-      <span class="small muted">Lo mismo cada día: pesas más cinta los días de gym y caminata el resto.</span></div>
+      <span class="small muted">Gym 4 días a la semana; los pasos, como tú quieras.</span></div>
     <div class="field"><label for="o-c">Minutos andando de ida y vuelta al gym</label><input class="inp" id="o-c" data-o="commute" inputmode="numeric" value="${esc(d.commute)}" placeholder="0 si vas en coche"></div>`;
   if(o.step===6){const old=state.settings;state.settings=onbApply(o,old);rebuildRoutine();const tg=targets();
     const wk=[1,2,3,4,5,6,0].map(i=>{const t=planType(i),R=ROUTINE[t];return `<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><b>${DAYNAMES[i]}</b><span class="muted">${R?esc(R.n):'Caminata'}</span></div>`}).join('');
