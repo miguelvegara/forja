@@ -439,7 +439,7 @@ function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k
     for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','brocoli','espinacas'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
   if(trainsOn(k)&&m.merienda)m.merienda=[...m.merienda,['platano',1,'x']];
-  return{m,names}}
+  return{m,names,k}}
 function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]||t==='walk'}
 /* Horario del día, calculado desde la hora de entreno */
 const toMin=t=>{const[a,b]=String(t||'20:00').split(':').map(Number);return (a||0)*60+(b||0)};
@@ -941,7 +941,7 @@ function buildMenu(tp){
     const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca;
     const post=meals.includes('cena')?'cena':snack;if(cGap>0)extra.push([post,'yogur',Math.min(3,Math.ceil(cGap/180))]);
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
-    if(mi.o3<200&&pass===0)extra.push([post,'sardinas',.5]); /* omega-3: media lata de sardinas los días sin pescado azul */
+    if(mi.o3<200&&pass===0&&(!tp.k||pk(tp.k).getDate()%2===0))extra.push([post,'sardinas',1]); /* lata entera en días alternos */ /* omega-3: media lata de sardinas los días sin pescado azul */
     const ban=state.settings.fruitPref==='platano'||state.settings.fruitPref==='mix',vGap=MIC_T.vC[0]*.97-mi.vC;
     if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['brocoli','judias','espinacas'].find(v=>!dv.has(v))||'brocoli',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([snack,'fruta',fq])}
     else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
