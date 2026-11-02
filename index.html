@@ -200,6 +200,7 @@ table.t td.r,table.t th.r{text-align:right;font-variant-numeric:tabular-nums}
 .mhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mhead .eyebrow{color:var(--accent)}
 .mdish{font-weight:700;font-size:16px;line-height:1.25}
+.mextra{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:10px}
 .mhow{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:10px;padding:8px 10px}
 .frow{display:grid;grid-template-columns:1fr auto;gap:0 12px;padding:8px 0;border-top:1px dashed var(--line)}
 .frow .fn{font-weight:600;font-size:14px;min-width:0}
@@ -351,7 +352,7 @@ const GROUPS={
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
 const EQ={pollo:'merluza',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
- arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',pan:'avena',avena:'pan',tortitas:'pan',cereales:'avena',
+ arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',pan:'molde',molde:'pan',avena:'cereales',tortitas:'molde',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
  fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
 function groupOf(f){for(const g in GROUPS)if(GROUPS[g].f.includes(f))return g;return null}
@@ -891,9 +892,9 @@ function buildMenu(tp){
     const mi=micOf(items.map(i=>[i.f,i.q])),extra=[],meals=[...new Set(items.map(i=>i.m))];
     const snack=meals.includes('merienda')?'merienda':meals.includes('desayuno')?'desayuno':meals[0],dinner=meals.includes('cena')?'cena':meals[meals.length-1];
     const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca;
-    if(cGap>0)extra.push([snack,'yogur',Math.min(3,Math.ceil(cGap/180))]);
+    const post=meals.includes('cena')?'cena':snack;if(cGap>0)extra.push([post,'yogur',Math.min(3,Math.ceil(cGap/180))]);
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
-    if(mi.o3<200&&pass===0)extra.push([snack,'sardinas',.5]); /* omega-3: media lata de sardinas los días sin pescado azul */
+    if(mi.o3<200&&pass===0)extra.push([post,'sardinas',.5]); /* omega-3: media lata de sardinas los días sin pescado azul */
     const ban=state.settings.fruitPref==='platano'||state.settings.fruitPref==='mix',vGap=MIC_T.vC[0]*.97-mi.vC;
     if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['brocoli','judias','espinacas'].find(v=>!dv.has(v))||'brocoli',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([snack,'fruta',fq])}
     else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
@@ -1170,14 +1171,14 @@ function vComida(){
       <button class="btn ghost sm" data-a="add" data-v="${m}">+ Añadir a ${l.toLowerCase()}</button></section>`;
   }).join('');
   const fixed=state.settings.menuFixed!==false;
-  const eqTxt=i=>{const e=EQ[i.f];if(!e||!F[e])return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
+  const eqTxt=i=>{const e=EQ[i.f];if(!e||!F[e]||(i.f==='platano'&&state.settings.fruitPref==='platano'))return'';const st=F[e].step||.5,same=['fruta','veg'].includes(groupOf(i.f)),q=same?i.q:Math.max(st,Math.round(convQ(i.f,e,i.q)/st)*st);
     return `<div class="feq">Si no tienes: <b>${esc(F[e].n)}</b> · ${esc(qtyG(F[e],q)||qtyHand(F[e],q))}${qtyG(F[e],q)?` (${esc(qtyHand(F[e],q))})`:''}</div>`};
   const fRow=i=>{const g=qtyG(F[i.f],i.q);return `<div class="frow"><span class="fn">${!fixed&&groupOf(i.f)?`<button class="swapbtn" data-a="swap-food" data-v="${i.orig||i.f}" aria-label="Cambiar ${esc(F[i.f].n)}">${esc(F[i.f].n)} <span aria-hidden="true">⇄</span></button>`:esc(F[i.f].n)}</span><span class="fq num">${esc(g||qtyHand(F[i.f],i.q))}</span>
     ${g?`<span></span><span class="fh r">${esc(qtyHand(F[i.f],i.q))}</span>`:''}${eqTxt(i)}</div>`};
   const menuHtml=MEALS.filter(([m])=>menu.some(i=>i.m===m)).map(([m,l])=>{const its=menu.filter(i=>i.m===m),t=its.reduce((a,i)=>{const f=F[i.f];a.k+=f.k*i.q;a.P+=f.P*i.q;return a},{k:0,P:0});
     return `<div class="mblk"><div class="mhead"><span class="eyebrow">${l}</span><span class="mtot"><span class="chip num">${nf(t.k)} kcal</span><span class="chip num">${nf(t.P)} g prot</span></span>${fixed?'':`<span class="row" style="gap:2px"><button class="btn ghost sm" data-a="mswap" data-v="${m}">Otra</button><button class="btn ghost sm" style="color:var(--muted)" data-a="mex" data-v="${m}">No me gusta</button></span>`}</div>
       <div class="mdish">${esc(tp.names[m].n)}</div>${tp.names[m].how?`<div class="mhow">${esc(tp.names[m].how)}</div>`:''}
-      <div>${its.map(fRow).join('')}</div></div>`}).join('');
+      <div>${its.filter(i=>!i.auto).map(fRow).join('')}</div>${its.some(i=>i.auto)?`<div class="mextra">${m==='cena'||m==='comida'?'Y de acompañamiento o postre':'Y además'}</div><div>${its.filter(i=>i.auto).map(fRow).join('')}</div>`:''}</div>`}).join('');
   return header()+`<div class="stack">
     ${kcalCard()}
     <section class="card stack">
