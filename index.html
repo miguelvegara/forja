@@ -2068,7 +2068,7 @@ document.addEventListener('click',e=>{
       if(!s.done&&s.reps==null&&rpI){const ph=rpI.placeholder.split('-');s.reps=parseInt(ph[1]||ph[0])||null}
       s.done=!s.done;
       const nx=arr[i+1];if(s.done&&nx&&nx.kg==null)nx.kg=s.kg;
-      saveDay();render();if(s.done)startRest(+el.dataset.rest,el.dataset.n,nextSet(el.dataset.ex,i));break}
+      saveDay();render();if(s.done){const nx=nextSet(el.dataset.ex,i);if(nx)startRest(+el.dataset.rest,el.dataset.n,nx);else{clearInterval(tmr.id);clearTones();$('#timer').hidden=true}}break}
     case't-add':if(tmr.end<Date.now()){tmr.end=Date.now();tmr.total=0}tmr.end+=15000;tmr.total+=15;tmr.spoke=false;$('#tin').classList.remove('go');$('#tstop').textContent='Saltar';audio();scheduleTones();clearInterval(tmr.id);tick();tmr.id=setInterval(tick,250);break;
     case't-stop':clearInterval(tmr.id);clearTones();$('#timer').hidden=true;break;
     case'tset':{state.settings[v]=v==='tWarn'?state.settings[v]!==true:state.settings[v]===false;saveSettings();if(v==='tAwake')keepAwake(ui.tab==='entreno'&&state.settings.tAwake!==false);render();break}
