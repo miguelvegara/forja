@@ -1261,6 +1261,15 @@ function vComida(){
       <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>
       ${(state.settings.mex&&Object.values(state.settings.mex).some(a=>a.length))?`<button class="btn ghost sm" data-a="mex-reset">Volver a mostrar los platos quitados</button>`:''}
     </section>
+    <section class="card stack"><h3>Reglas fijas: no decides nada</h3>
+      <ol class="small" style="margin:0;padding-left:20px;display:grid;gap:6px">
+        <li><b>Comes lo que pone el menú,</b> a la hora del horario. Nada más.</li>
+        <li><b>¿Hambre fuera de hora?</b> Un plátano. Siempre lo mismo.</li>
+        <li><b>¿No tienes el tupper hecho?</b> Plan B: 1 lata de atún, 2 trozos de pan integral (del congelador) y ensalada. Siempre hay en casa.</li>
+        <li><b>¿Comes fuera?</b> Carne o pescado a la plancha con patata o arroz y ensalada. Sin pan extra ni postre. Agua o refresco zero.</li>
+        <li><b>Una comida libre a la semana,</b> la que tú quieras, sin culpa. Al día siguiente, menú normal.</li>
+        <li><b>¿Te has saltado algo?</b> No compenses. La siguiente comida, la del menú.</li>
+      </ol></section>
     ${phaseCard()}
     ${limitsCard()}
     ${state.settings.menuFixed!==false?'':subsCard()}
@@ -1470,6 +1479,7 @@ function vShop(){
         ${days>=14?`<div>• <b>Lácteos</b> (queso batido, yogur): coge los de fecha más lejana; suelen aguantar 3-5 semanas. <b>Huevos:</b> unas 4 semanas en la nevera.</div>
         <div>• <b>Fruta:</b> ${['platano','mix'].includes(state.settings.fruitPref)?'las naranjas aguantan 3-4 semanas en la nevera. Los plátanos: compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas y peras aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
       </div></section>`:''}
+    <div class="callout small"><b>Plan B siempre en casa:</b> 2 latas de atún al natural y 1 barra de pan integral cortada en el congelador. Repón cuando las gastes.</div>
     <div class="callout small">No compres nada fuera de esta lista: es justo lo que vas a comer. Lo que pone «sobran» es porque el envase es más grande de lo que necesitas; úsalo el mes siguiente. Además: sal, especias y café a tu gusto.</div>
   </div>`;
 }
