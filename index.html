@@ -329,6 +329,8 @@ const F={
  brocoli:{n:'Brócoli congelado',u:['puño','puños'],g:100,P:2.8,C:4,F:.4,cat:'fruta'},
  judias:{n:'Judías verdes congeladas',u:['puño','puños'],g:100,P:1.8,C:4,F:.2,cat:'fruta'},
  salteado:{n:'Salteado de verduras congelado',u:['puño','puños'],g:100,P:1.5,C:5,F:.3,cat:'fruta'},
+ libreC:{n:'Plato libre (regla del plato)',u:['plato','platos'],P:45,C:85,F:28,cat:'fuera'},
+ libreM:{n:'Merienda libre',u:['merienda','meriendas'],P:12,C:40,F:8,cat:'fuera'},
  espinacas:{n:'Espinacas congeladas',u:['puño','puños'],g:100,P:2.9,C:1.5,F:.4,cat:'fruta'}
 };
 for(const k in F){const f=F[k]; if(f.k==null) f.k=f.P*4+f.C*4+f.F*9;}
@@ -344,6 +346,7 @@ const MIC_RAW={
  leche:[0,300,0,27,380,0,1,0,.1], skyr:[0,180,0,15,220,0,.6,0,0], batido:[0,250,0,25,350,0,1,0,0], whey:[0,120,.3,20,150,0,.5,0,0], yogur:[0,180,0,15,220,0,.7,0,0],
  platano:[3,6,.3,32,420,10,.2,0,0], citrico:[3.5,55,.3,20,300,75,.2,0,0], fruta:[3.5,30,.2,12,220,40,.1,0,0], verdura:[2.5,40,.8,20,300,40,.4,0,0],
  tostada:[2,20,1,15,100,5,.5,0,0], bocata:[4,60,3,50,500,0,3,0,0], plato:[5,80,3,70,900,15,4,0,0], tortilla:[1,30,1,15,250,5,.7,0,.5], pizza:[2,150,1.2,25,180,0,1.3,0,0], kebab:[4,100,4,60,600,10,5,0,0],
+ libreC:[8,80,3,70,900,30,4,0,0], libreM:[3,150,.5,30,400,10,.8,0,0],
  cerveza:[0,8,0,12,55,0,0,0,0], refresco:[0,0,0,0,0,0,0,0,0]
 };
 for(const k in MIC_RAW){const m={};MIC_KEYS.forEach((x,i)=>m[x]=MIC_RAW[k][i]);if(F[k])F[k].mic=m}
@@ -444,16 +447,18 @@ function optFor(k,meal){
   const i=((base*STRIDE[meal]+shift)%pool.length+pool.length)%pool.length;
   return pool[i];
 }
-function menuTpl(k){const m={},names={};mealPlan().forEach(ml=>{const o=optFor(k,ml);m[ml]=o.i;names[ml]=o});
+const FREE={comida:{id:'libreC',n:'Comida libre',how:'Lo que haya, en casa o fuera. Regla del plato: 1-2 palmas de carne o pescado, 1-2 puños de arroz, pasta, patata, pan o legumbre y medio plato de verdura o ensalada. Sin repetir. Agua. De postre fruta o nada.',i:[['libreC',1,'x']]},
+ merienda:{id:'libreM',n:'Merienda libre',how:'Algo sencillo: un yogur o queso batido con fruta, o un bocadillo pequeño de pavo o atún. Si no tienes hambre, nada.',i:[['libreM',1,'x']]}};
+function menuTpl(k){const m={},names={},fm=state.settings.freeMid===true;mealPlan().forEach(ml=>{const o=fm&&FREE[ml]?FREE[ml]:optFor(k,ml);m[ml]=o.i;names[ml]=o});
   const simp=state.settings.simple!==false&&k>=SIMPLE_FROM;
   if(state.settings.mode==='cut'&&m.cena&&!simp)m.cena=[...m.cena,['batido',.75,'x']];
   if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['brocoli',1,'x']]; /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
-  if(state.settings.mode==='cut'&&m.comida)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
+  if(state.settings.mode==='cut'&&m.comida&&!fm)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
     for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','brocoli','espinacas'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
-  if(trainsOn(k)&&m.merienda)m.merienda=[...m.merienda,['platano',1,'x']];
+  if(trainsOn(k)&&m.merienda&&!fm)m.merienda=[...m.merienda,['platano',1,'x']];
   return{m,names,k}}
 function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]}
 /* Horario del día, calculado desde la hora de entreno */
@@ -1264,6 +1269,7 @@ function vComida(){
       <div class="grid2"><button class="btn primary" data-a="menu-load">Comí el menú</button><button class="btn" data-a="add" data-v="${mealNow()}">Apuntar otra cosa</button></div>
       ${(state.settings.mex&&Object.values(state.settings.mex).some(a=>a.length))?`<button class="btn ghost sm" data-a="mex-reset">Volver a mostrar los platos quitados</button>`:''}
     </section>
+    <section class="card stack"><div class="spread"><span><b>Solo desayuno y cena fijos</b><br><span class="small muted">La comida${mealPlan().includes('merienda')?' y la merienda':''} libres, con la regla del plato.</span></span><button class="toggle ${state.settings.freeMid===true?'on':''}" data-a="free-mid" aria-pressed="${state.settings.freeMid===true}" aria-label="Solo desayuno y cena fijos"></button></div></section>
     <section class="card stack"><h3>Reglas fijas: no decides nada</h3>
       <ol class="small" style="margin:0;padding-left:20px;display:grid;gap:6px">
         <li><b>Comes lo que pone el menú,</b> a la hora del horario. Nada más.</li>
@@ -2164,6 +2170,7 @@ document.addEventListener('click',e=>{
     case'look-open':ui.look=v||'look';render();window.scrollTo(0,0);break;
     case'look-close':ui.look=false;render();window.scrollTo(0,0);break;
     case'look-tick':{const l={...(state.settings.look||{})};if(l[v])delete l[v];else l[v]=1;state.settings.look=l;saveSettings();render();break}
+    case'free-mid':state.settings.freeMid=state.settings.freeMid!==true;saveSettings();render();break;
     case'goto':ui.cur=v;ui.showWalk=false;ui.swapOpen=null;render();break;
     case'prev':ui.cur=add(ui.cur,-1);ui.showWalk=false;ui.swapOpen=null;render();break;
     case'next':ui.cur=add(ui.cur,1);ui.showWalk=false;ui.swapOpen=null;render();break;
