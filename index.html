@@ -1122,7 +1122,7 @@ function vHoy(){
     const doneSets=Object.values(d.sets||{}).flat().filter(s=>s&&s.done).length;
     const total=R.ex.reduce((a,e)=>a+exObj(e).sets,0);
     session=`<section class="card stack"><div class="spread"><h2>${esc(R.n)}</h2><span class="chip num">${doneSets}/${total} series</span></div>
-      <p class="muted small" style="margin:0">${esc(R.focus)} · ${dayTotalMin(R)} min: ${state.settings.commute||0} de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''}${isDeload()?' · <b>semana de descarga</b>':''}</p>
+      <p class="muted small" style="margin:0">${esc(R.focus)} · ⏱ unos ${liftMin(R)} min con calentamiento${isDeload()?' · <b>semana de descarga</b>':''}</p>
       <button class="btn primary block" data-a="tab" data-v="entreno">${doneSets?'Seguir con el entreno':'Empezar entreno'}</button></section>`;
   }else if(type==='walk'){
     session=stepsCard();
@@ -1493,8 +1493,8 @@ function vEntreno(){
   const typeSel=`<div class="row wrap">${Object.keys(TYPES).filter(t=>planTypes().includes(t)||t==='walk'||t==='rest'||t===type).map(t=>`<button class="chip ${t===type?'on':''}" data-a="type" data-v="${t}">${TYPES[t]}</button>`).join('')}</div>`;
   if(R){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
-      <p class="small muted" style="margin:0">${esc(R.focus)}. Hoy: ${state.settings.commute||0} min andando de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''} = ${dayTotalMin(R)} min. Calentamiento: 5 min de bici, 10 chin tucks, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
-      <div class="row wrap"><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
+      <p class="small muted" style="margin:0">${esc(R.focus)}. Calentamiento: 5 min de bici, 10 chin tucks, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
+      <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso (en iPhone pausa la música)')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
