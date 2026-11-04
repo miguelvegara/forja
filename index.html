@@ -568,13 +568,14 @@ const BASE_R={
   ['curlInc','Curl inclinado con mancuernas',3,8,12,90,1,['Curl bayesian en polea']],
   ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,90,1,['Press francés con barra Z']],
   ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']]]},
- hombroX:{n:'Hombro y brazos · día extra',focus:'Lo que más se ve con camiseta',ex:[
+ hombroX:{n:'Hombro, brazos y postura',focus:'Hombros anchos, brazos, abdomen y cuello en su sitio',ex:[
   ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Face pull']],
+  ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,90,1,['Aperturas inversas en máquina']],
+  ['fondos','Fondos asistidos',3,8,12,120,2.5,['Press cerrado en máquina']],
   ['curlMartillo','Curl martillo',3,10,15,90,1,['Curl martillo en polea con cuerda']],
   ['triCuerda','Extensión de tríceps con cuerda',3,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
   ['curl','Curl de bíceps en polea',2,10,15,90,1,['Curl inclinado con mancuernas']],
-  ['fondos','Fondos asistidos',2,8,12,90,2.5,['Press cerrado en máquina']]]},
+  ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']]]},
  fbA:{n:'Cuerpo completo A',focus:'Pierna, pecho alto, espalda y hombro',ex:[
   ['hackA','Sentadilla hack',3,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
   ['pressInc','Press inclinado con mancuernas (banco 30°)',3,6,10,150,2,['Press inclinado en máquina']],
@@ -1492,7 +1493,7 @@ function vEntreno(){
   const typeSel=`<div class="row wrap">${Object.keys(TYPES).filter(t=>planTypes().includes(t)||t==='walk'||t==='rest'||t===type).map(t=>`<button class="chip ${t===type?'on':''}" data-a="type" data-v="${t}">${TYPES[t]}</button>`).join('')}</div>`;
   if(R){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
-      <p class="small muted" style="margin:0">${esc(R.focus)}. Hoy: ${state.settings.commute||0} min andando de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''} = ${dayTotalMin(R)} min. Calentamiento: 5 min de bici o cinta, 10 chin tucks y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
+      <p class="small muted" style="margin:0">${esc(R.focus)}. Hoy: ${state.settings.commute||0} min andando de ida y vuelta, ${liftMin(R)} de gym${cintaMin(R)?' y '+cintaMin(R)+' de cinta':''} = ${dayTotalMin(R)} min. Calentamiento: 5 min de bici, 10 chin tucks, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
       <div class="row wrap"><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
