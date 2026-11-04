@@ -788,7 +788,7 @@ function day(k=ui.cur){let d=state.days[k];if(!d){d=state.days[k]={foods:[],sets
 function peek(k){return state.days[k]||null}
 function planType(i){const s=state.settings,n=s.days||4;
   if(n===3)return({1:'fbA',3:'fbB',5:'fbC'})[i]||'walk';
-  if(n>=5&&i===6)return s.focus==='glute'?'gluteX':'hombroX';
+  if(n>=5)return({1:'torsoA',2:'piernaA',3:'torsoB',4:'piernaB',5:s.focus==='glute'?'gluteX':'hombroX'})[i]||'walk'; /* 5 días: lunes a viernes, fin de semana libre */
   return DOW[i];}
 function planTypes(){return [...new Set([1,2,3,4,5,6,0].map(planType))]}
 function dayType(k=ui.cur){const d=peek(k);return (d&&d.type)||planType(pk(k).getDay())}
