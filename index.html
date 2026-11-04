@@ -540,13 +540,14 @@ const SHOP={
 /* ================= RUTINA EN V ================= */
 /* [clave, nombre, series, repsMin, repsMax, descanso s, subida kg, alternativas, unidad] */
 const BASE_R={
- torsoA:{n:'Torso A · Anchura',focus:'Pecho alto, espalda ancha, hombro lateral y cuello',ex:[
+ torsoA:{n:'Torso A · Anchura',focus:'Pecho, espalda ancha, hombro lateral y cuello',ex:[
   ['pressInc','Press inclinado con mancuernas (banco 30°)',4,6,10,150,2,['Press inclinado en máquina','Press inclinado en multipower']],
   ['jalon','Jalón al pecho, agarre neutro',4,8,12,120,2.5,['Dominadas asistidas','Jalón a una mano en polea']],
   ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas','Elevación lateral tumbado de lado']],
   ['remoPecho','Remo con pecho apoyado',3,8,12,120,2.5,['Remo en máquina','Remo con mancuerna a una mano']],
+  ['aperPecho','Aperturas en máquina (contractora)',3,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
   ['curl','Curl de bíceps en polea',3,10,15,90,1,['Curl inclinado con mancuernas','Curl en banco Scott']],
-  ['triCuerda','Extensión de tríceps con cuerda',3,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
+  ['triCuerda','Extensión de tríceps con cuerda',2,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
   ['neck','Flexión de cuello tumbado (disco en la frente)',2,15,20,60,1.25,['Flexión de cuello con banda elástica']]]},
  piernaA:{n:'Pierna A + hombro',focus:'Cuádriceps, femoral, hombro y abdomen',ex:[
   ['hackA','Sentadilla hack',4,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
@@ -557,14 +558,15 @@ const BASE_R={
   ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Pájaros en polea cruzada','Face pull']],
   ['gemelo','Gemelos en máquina',3,10,15,90,2.5,['Gemelos en prensa']],
   ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']]]},
- torsoB:{n:'Torso B · Espalda y hombro',focus:'Más anchura de espalda, hombros redondos, brazos y cuello',ex:[
+ torsoB:{n:'Torso B · Espalda y hombro',focus:'Espalda ancha, pecho, hombros redondos, brazos y cuello',ex:[
   ['dominada','Dominadas asistidas o jalón agarre ancho',4,6,10,150,2.5,['Jalón al pecho agarre ancho']],
-  ['pressMaq','Press de pecho inclinado en máquina',3,8,12,120,2.5,['Press de banca con mancuernas']],
+  ['pressMaq','Press de pecho inclinado en máquina',4,8,12,120,2.5,['Press de banca con mancuernas']],
   ['remoPolea','Remo en polea sentado, codos pegados',3,10,12,120,2.5,['Remo en máquina']],
   ['pressHombro','Press de hombro en máquina',3,8,12,120,2.5,['Press militar con mancuernas sentado']],
-  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
+  ['aperPecho','Aperturas en máquina (contractora)',2,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
   ['curlInc','Curl inclinado con mancuernas',3,8,12,90,1,['Curl bayesian en polea']],
-  ['triFrances','Extensión de tríceps sobre la cabeza en polea',3,8,12,90,1,['Press francés con barra Z']],
+  ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,90,1,['Press francés con barra Z']],
   ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']]]},
  hombroX:{n:'Hombro y brazos · día extra',focus:'Lo que más se ve con camiseta',ex:[
   ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
