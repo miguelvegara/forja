@@ -305,7 +305,7 @@ const F={
  cacahuete:{n:'Crema de cacahuete',u:['cucharada','cucharadas'],g:15,P:4,C:2,F:7.5,cat:'grasa'},
  queso:{n:'Queso semicurado',u:['loncha','lonchas'],g:15,P:4,C:0,F:5,cat:'grasa',step:1},
  choco:{n:'Chocolate negro 85%',u:['onza','onzas'],g:10,P:1,C:2,F:4.5,cat:'grasa',step:1},
- leche:{n:'Leche semidesnatada',u:['vaso','vasos'],g:250,ml:1,P:8,C:12,F:4,cat:'lacteo'},
+ leche:{n:'Leche semidesnatada sin lactosa',u:['vaso','vasos'],g:250,ml:1,P:8,C:12,F:4,cat:'lacteo'},
  skyr:{n:'Yogur +Proteínas natural',u:['tarrina','tarrinas'],g:150,P:15,C:6,F:.3,cat:'lacteo'},
  batido:{n:'Queso fresco batido 0%',u:['vaso','vasos'],g:250,P:20,C:9,F:.5,cat:'lacteo'},
  whey:{n:'Proteína whey',u:['cacito','cacitos'],g:30,P:24,C:2,F:1.5,cat:'lacteo'},
@@ -385,7 +385,7 @@ const OPTS={
   {id:'batidoavena',how:'Todo en un bol. Sin cocinar.',n:'Queso batido con avena, fruta y nueces',i:[['batido',1,'x'],['avena',1.5,'c'],['fruta',1,'x'],['nueces',.5,'f']]},
   {id:'aguacate',how:'Tostadas con aguacate machacado con un tenedor; huevos ya cocidos y pelados.',n:'Tostadas de aguacate con huevos y leche',i:[['pan',1.5,'c'],['aguacate',1,'f'],['huevo',2,'x'],['leche',1,'x']]}],
  comida:[
-  {id:'polloarroz',how:'Pollo y arroz del tupper, 2 min al microondas. Brócoli congelado 5 min al microondas.',n:'Pollo con arroz y verdura',i:[['pollo',2,'x'],['arroz',2,'c'],['brocoli',1,'x'],['aceite',1,'f']]},
+  {id:'polloarroz',how:'Pollo y arroz del tupper, 2 min al microondas. Judías verdes congeladas 5 min al microondas.',n:'Pollo con arroz y verdura',i:[['pollo',2,'x'],['arroz',2,'c'],['judias',1,'x'],['aceite',1,'f']]},
   {id:'pavopasta',how:'Pasta y pollo del tupper con tomate triturado y el salteado congelado, todo junto 4 min al microondas.',n:'Pasta con pollo, tomate y verduras',i:[['pollo',2,'x'],['pasta',2,'c'],['salteado',1,'x'],['aceite',1,'f']]},
   {id:'legumbrepollo',how:'Bote de garbanzos enjuagado, pollo del tupper y espinacas congeladas: todo junto 4 min al microondas.',n:'Garbanzos con pollo y espinacas',i:[['legumbre',2,'c'],['pollo',1.5,'x'],['espinacas',1,'x'],['aceite',1,'f']]},
   {id:'pavopatata',how:'Pollo del tupper; patatas en bolsa de microondas 8 min y judías verdes congeladas al microondas.',n:'Pollo con patata y judías verdes',i:[['pollo',2,'x'],['patata',2,'c'],['judias',1,'x'],['aceite',1,'f']]},
@@ -410,13 +410,13 @@ const OPTS={
  cena:[
   {id:'merluza',how:'Pollo del tupper, patatas de microondas y judías verdes al microondas, con un chorrito de aceite y pimentón.',fish:1,n:'Pollo al pimentón con patata y judías',i:[['pollo',1.5,'p'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f']]},
   {id:'tortilla',how:'Patatas de microondas en dados con los huevos y las claras batidos por encima, 3 min más al microondas. Ensalada 4 estaciones.',n:'Tortilla de patata al microondas con ensalada',i:[['huevo',2,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1,'x'],['aceite',1,'f']]},
-  {id:'pollocena',how:'Pollo del tupper, patatas de microondas 8 min y brócoli congelado al microondas.',n:'Pollo con patata y brócoli',i:[['pollo',1.5,'p'],['patata',2,'c'],['brocoli',1,'x'],['aceite',.5,'f']]},
+  {id:'pollocena',how:'Pollo del tupper, patatas de microondas 8 min y judías verdes congeladas al microondas.',n:'Pollo con patata y judías verdes',i:[['pollo',1.5,'p'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f']]},
   {id:'burger',how:'Bocadillo con el pollo del tupper en tiras, tomate y ensalada 4 estaciones. Sin cocinar.',n:'Bocadillo de pollo con ensalada',i:[['pollo',1.5,'p'],['pan',1.5,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
   {id:'revuelto',how:'Huevos y claras batidos con espinacas congeladas en un bol, 3 min al microondas removiendo a mitad. Pan.',n:'Revuelto de huevos y espinacas con pan',i:[['huevo',2,'x'],['claras',1,'p'],['pan',1.5,'c'],['espinacas',1,'x']]},
   {id:'atunpasta',how:'Pasta y pollo del tupper en frío con atún, huevo ya cocido y ensalada 4 estaciones. Sin cocinar.',fish:1,n:'Ensalada de pasta con atún, pollo y huevo',i:[['atun',1,'x'],['huevo',1,'x'],['pollo',1,'p'],['pasta',2,'c'],['ensalada',1,'x'],['aceite',.5,'f']]},
   {id:'ternera',how:'Filetes del tupper, patatas de microondas y judías verdes al microondas. Queso batido de postre.',n:'Filete de ternera con patata y queso batido de postre',i:[['ternera',1,'x'],['patata',2,'c'],['judias',1,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'lentejascena',how:'Lentejas de bote enjuagadas con el salteado congelado, 4 min al microondas, y 1 huevo ya cocido. Queso batido de postre.',n:'Lentejas estofadas con verduras, huevo y queso batido de postre',i:[['lentejas',2,'c'],['huevo',1,'x'],['salteado',1.5,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
-  {id:'pastapollo',how:'Pasta y pollo del tupper con brócoli congelado, todo 4 min al microondas.',n:'Macarrones con pollo y verduras',i:[['pollo',1.5,'p'],['pasta',2,'c'],['brocoli',1.5,'x'],['aceite',.5,'f']]},
+  {id:'pastapollo',how:'Pasta y pollo del tupper con espinacas congeladas, todo 4 min al microondas.',n:'Macarrones con pollo y espinacas',i:[['pollo',1.5,'p'],['pasta',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
   {id:'sardinascena',how:'Una lata de sardinas; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Sardinas con tortilla de claras, patata y ensalada',i:[['sardinas',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
   {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
   {id:'mejillones',how:'Una lata de mejillones; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Mejillones con tortilla de claras, patata y ensalada',i:[['mejillones',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]}]
@@ -452,11 +452,11 @@ const FREE={comida:{id:'libreC',n:'Comida libre',how:'Lo que haya, en casa o fue
 function menuTpl(k){const m={},names={},fm=state.settings.freeMid===true;mealPlan().forEach(ml=>{const o=fm&&FREE[ml]?FREE[ml]:optFor(k,ml);m[ml]=o.i;names[ml]=o});
   const simp=state.settings.simple!==false&&k>=SIMPLE_FROM;
   if(state.settings.mode==='cut'&&m.cena&&!simp)m.cena=[...m.cena,['batido',.75,'x']];
-  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['brocoli',1,'x']]; /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
+  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['judias',1,'x']]; /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
   if(state.settings.mode==='cut'&&m.comida&&!fm)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
-    for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','brocoli','espinacas'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
+    for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','espinacas','brocoli'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
   if(trainsOn(k)&&m.merienda&&!fm)m.merienda=[...m.merienda,['platano',1,'x']];
   return{m,names,k}}
@@ -507,7 +507,7 @@ const SHOP={
  merluza:{s:0,n:'Filetes de merluza congelados',d:'Arcón de congelados, zona de pescado. Bolsa de «Filetes de merluza sin piel» Hacendado (al natural, NO rebozada).',per:180,pack:600,pu:'bolsa ~600 g',cook:1},
  huevo:{s:1,n:'Huevos L',d:'Pasillo de los huevos. Cartón de 12 huevos talla L.',per:1,pack:12,pu:'docena',u:'ud'},
  claras:{s:1,n:'Claras de huevo pasteurizadas Hacendado',d:'Nevera junto a los huevos. Botella de 1 L de claras líquidas. Una vez abierta, gástala en pocos días.',per:200,pack:1000,pu:'botella 1 L',ml:1},
- leche:{s:1,n:'Leche semidesnatada Hacendado',d:'Pasillo de la leche (no está en nevera). Brick de 1 L. Se vende suelto o en pack de 6.',per:250,pack:1000,pu:'brick 1 L',ml:1},
+ leche:{s:1,n:'Leche semidesnatada sin lactosa Hacendado',d:'Pasillo de la leche (no está en nevera). Brick de 1 L. Se vende suelto o en pack de 6.',per:250,pack:1000,pu:'brick 1 L',ml:1},
  batido:{s:1,n:'Queso fresco batido 0% Hacendado',d:'Nevera de yogures. Tarrina blanca grande de 500 g; por dentro es como un yogur muy espeso.',per:250,pack:500,pu:'tarrina 500 g'},
  skyr:{s:1,n:'Yogur +Proteínas natural Hacendado',d:'Nevera de yogures. Yogur natural con «+Proteínas» en el envase, sin sabores.',per:1,pack:1,pu:'yogur',u:'ud'},
  yogur:{s:1,n:'Yogur natural Hacendado',d:'Nevera de yogures. Yogur natural normal: sin azúcar, sin sabor, que no sea griego. Se venden en packs: coge los packs que hagan falta para llegar a esta cantidad.',per:1,pack:1,pu:'yogur',u:'ud'},
@@ -975,7 +975,7 @@ function buildMenu(tp){
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
     if(mi.o3<200&&pass===0&&(!tp.k||pk(tp.k).getDate()%2===0))extra.push([post,'sardinas',1]); /* lata entera en días alternos */ /* omega-3: media lata de sardinas los días sin pescado azul */
     const ban=state.settings.fruitPref==='platano'||state.settings.fruitPref==='mix',vGap=MIC_T.vC[0]*.97-mi.vC;
-    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['brocoli','judias','espinacas'].find(v=>!dv.has(v))||'brocoli',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fq])}
+    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['judias','espinacas','brocoli'].find(v=>!dv.has(v))||'judias',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fq])}
     else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
     if(!extra.length)break;
     tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
