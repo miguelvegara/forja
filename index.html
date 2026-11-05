@@ -1164,7 +1164,7 @@ function vHoy(){
     <section class="card stack">
       <div class="spread"><h3>Hábitos clave</h3><span class="chip num ${sc>=7?'on':''}">${sc}/${HAB.length}</span></div>
       <div>${HAB.map(h=>{const on=habOn(h,d,ui.cur);return `<div class="spread" style="padding:7px 0;border-top:1px solid var(--line)">
-        <span style="min-width:0">${esc(h.n)}${h.auto?` <span class="unit">auto</span>`:''}</span>
+        <span style="min-width:0">${h.k==='steps'?'Pasos del día: <b class="num">'+th(stepTarget())+'</b>':esc(h.n)}</span>
         ${h.auto?`<span class="done ${on?'on':''}" style="width:36px;height:32px" aria-label="${on?'Hecho':'Pendiente'}">${ICON.check}</span>`
           :`<button class="done ${on?'on':''}" style="width:36px;height:32px" data-a="hab" data-v="${h.k}" aria-pressed="${on}" aria-label="${esc(h.n)}">${ICON.check}</button>`}
       </div>`}).join('')}</div>
