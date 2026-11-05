@@ -1043,13 +1043,16 @@ function sleepH(d){
 }
 const fmtH=h=>Math.floor(h)+' h '+String(Math.round((h%1)*60)).padStart(2,'0');
 function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk||(d.steps>=stepTarget(k));return false}
-/* Lo esencial: solo lo que da el físico. Nada más. */
+/* Lo esencial: lo que más pesa para gustar (cuerpo, cara, pelo y trato). Nada más. */
 const HAB=[
  {k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
  {k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
  {k:'menu',n:'Desayuno y cena del menú'},
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
- {k:'crea',n:'Creatina (5 g)'}
+ {k:'crea',n:'Creatina (5 g)'},
+ {k:'piel',n:'Piel: limpiador, hidratante y protector solar por la mañana'},
+ {k:'pelo',n:'Pelo: crema de rizos y secar al aire (1 min)'},
+ {k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'}
 ];
 function habOn(h,d,k){if(h.auto)return h.auto(d,k);if(!d)return false;if(h.k==='crea')return!!d.crea;return!!(d.hab&&d.hab[h.k])}
 function habScore(k){const d=peek(k);return HAB.filter(h=>habOn(h,d,k)).length}
