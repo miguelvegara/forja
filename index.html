@@ -553,7 +553,8 @@ const BASE_R={
   ['aperPecho','Aperturas en máquina (contractora)',3,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
   ['curl','Curl de bíceps en polea',3,10,15,90,1,['Curl inclinado con mancuernas','Curl en banco Scott']],
   ['triCuerda','Extensión de tríceps con cuerda',2,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
-  ['neck','Flexión de cuello tumbado (disco en la frente)',2,15,20,60,1.25,['Flexión de cuello con banda elástica']]]},
+  ['neck','Flexión de cuello tumbado (disco en la frente)',2,15,20,60,1.25,['Flexión de cuello con banda elástica']],
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
  piernaA:{n:'Pierna A + hombro',focus:'Cuádriceps, femoral, hombro y abdomen',ex:[
   ['hackA','Sentadilla hack',4,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
   ['rumano','Peso muerto rumano',3,8,10,150,2.5,['Peso muerto rumano con mancuernas','Hiperextensiones con peso']],
@@ -562,7 +563,8 @@ const BASE_R={
   ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
   ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Pájaros en polea cruzada','Face pull']],
   ['gemelo','Gemelos en máquina',3,10,15,90,2.5,['Gemelos en prensa']],
-  ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']]]},
+  ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']],
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
  torsoB:{n:'Torso B · Espalda y hombro',focus:'Espalda ancha, pecho, hombros redondos, brazos y cuello',ex:[
   ['dominada','Dominadas asistidas o jalón agarre ancho',4,6,10,150,2.5,['Jalón al pecho agarre ancho']],
   ['pressMaq','Press de pecho inclinado en máquina',4,8,12,120,2.5,['Press de banca con mancuernas']],
@@ -572,7 +574,8 @@ const BASE_R={
   ['aperPecho','Aperturas en máquina (contractora)',2,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
   ['curlInc','Curl inclinado con mancuernas',3,8,12,90,1,['Curl bayesian en polea']],
   ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,90,1,['Press francés con barra Z']],
-  ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']]]},
+  ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']],
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
  hombroX:{n:'Hombro, brazos y postura',focus:'Hombros anchos, brazos, abdomen y cuello en su sitio',ex:[
   ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
   ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,90,1,['Aperturas inversas en máquina']],
@@ -580,7 +583,8 @@ const BASE_R={
   ['curlMartillo','Curl martillo',3,10,15,90,1,['Curl martillo en polea con cuerda']],
   ['triCuerda','Extensión de tríceps con cuerda',3,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
   ['curl','Curl de bíceps en polea',2,10,15,90,1,['Curl inclinado con mancuernas']],
-  ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']]]},
+  ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
  fbA:{n:'Cuerpo completo A',focus:'Pierna, pecho alto, espalda y hombro',ex:[
   ['hackA','Sentadilla hack',3,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
   ['pressInc','Press inclinado con mancuernas (banco 30°)',3,6,10,150,2,['Press inclinado en máquina']],
@@ -622,7 +626,8 @@ const BASE_R={
   ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
   ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Face pull']],
   ['gemelo','Gemelos en máquina',3,10,15,90,2.5,['Gemelos en prensa']],
-  ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']]]}
+  ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]}
 };
 const ROUTINE={};
 const LEGDAYS=['piernaA','piernaB','fbA','fbB','fbC'];
@@ -1046,7 +1051,7 @@ const HAB=[
  {k:'crea',n:'Creatina (5 g)'},
  {k:'sol',n:'10 min de luz de sol al levantarte'},
  {k:'spf',n:'Protector solar en la cara'},
- {k:'chin',n:'Chin tucks: 2 × 10 (1 minuto)'},
+ {k:'chin',n:'Chin tucks 2 × 10 (días sin gym; en el gym ya van en el entreno)'},
  {k:'agua',n:'Unos 3 L de agua (orina clara)'},
  {k:'cafe',n:'Café solo antes de las 15:00'},
  {k:'alc',n:'Sin alcohol, o 2 cañas como mucho'}
@@ -1499,7 +1504,7 @@ function vEntreno(){
   const typeSel=`<div class="row wrap">${Object.keys(TYPES).filter(t=>planTypes().includes(t)||t==='walk'||t==='rest'||t===type).map(t=>`<button class="chip ${t===type?'on':''}" data-a="type" data-v="${t}">${TYPES[t]}</button>`).join('')}</div>`;
   if(R){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
-      <p class="small muted" style="margin:0">${esc(R.focus)}. Calentamiento: 5 min de bici, 10 chin tucks, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
+      <p class="small muted" style="margin:0">${esc(R.focus)}. Calentamiento: 5 min de bici, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
       <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
