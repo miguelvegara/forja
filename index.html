@@ -1043,18 +1043,13 @@ function sleepH(d){
 }
 const fmtH=h=>Math.floor(h)+' h '+String(Math.round((h%1)*60)).padStart(2,'0');
 function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk||(d.steps>=stepTarget(k));return false}
+/* Lo esencial: solo lo que da el físico. Nada más. */
 const HAB=[
+ {k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
+ {k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
+ {k:'menu',n:'Desayuno y cena del menú'},
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
- {k:'prot',n:'Llegar a tu proteína',auto:(d,k)=>totals(k).P>=targets().P*.95},
- {k:'move',n:'Entreno hecho o pasos del día',auto:(d,k)=>moved(d,k)},
- {k:'steps',n:'Pasos del día',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
- {k:'crea',n:'Creatina (5 g)'},
- {k:'sol',n:'10 min de luz de sol al levantarte'},
- {k:'spf',n:'Protector solar en la cara'},
- {k:'chin',n:'Chin tucks 2 × 10 (días sin gym; en el gym ya van en el entreno)'},
- {k:'agua',n:'Unos 3 L de agua (orina clara)'},
- {k:'cafe',n:'Café solo antes de las 15:00'},
- {k:'alc',n:'Sin alcohol, o 2 cañas como mucho'}
+ {k:'crea',n:'Creatina (5 g)'}
 ];
 function habOn(h,d,k){if(h.auto)return h.auto(d,k);if(!d)return false;if(h.k==='crea')return!!d.crea;return!!(d.hab&&d.hab[h.k])}
 function habScore(k){const d=peek(k);return HAB.filter(h=>habOn(h,d,k)).length}
@@ -1167,7 +1162,7 @@ function vHoy(){
       <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
     </section>
     <section class="card stack">
-      <div class="spread"><h3>Hábitos clave</h3><span class="chip num ${sc>=7?'on':''}">${sc}/${HAB.length}</span></div>
+      <div class="spread"><h3>Lo esencial</h3><span class="chip num ${sc>=HAB.length?'on':''}">${sc}/${HAB.length}</span></div>
       <div>${HAB.map(h=>{const on=habOn(h,d,ui.cur);return `<div class="spread" style="padding:7px 0;border-top:1px solid var(--line)">
         <span style="min-width:0">${h.k==='steps'?'Pasos del día: <b class="num">'+th(stepTarget())+'</b>':esc(h.n)}</span>
         ${h.auto?`<span class="done ${on?'on':''}" style="width:36px;height:32px" aria-label="${on?'Hecho':'Pendiente'}">${ICON.check}</span>`
