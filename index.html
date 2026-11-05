@@ -1051,7 +1051,7 @@ const HAB=[
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
  {k:'crea',n:'Creatina (5 g)'},
  {k:'piel',n:'Piel: limpiador, hidratante y protector solar por la mañana'},
- {k:'pelo',n:'Pelo: crema de rizos y secar al aire (1 min)'},
+ {k:'pelo',n:'Pelo: crema de rizos + espuma con el pelo empapado, estrujar con camiseta y no tocarlo hasta que seque'},
  {k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'}
 ];
 function habOn(h,d,k){if(h.auto)return h.auto(d,k);if(!d)return false;if(h.k==='crea')return!!d.crea;return!!(d.hab&&d.hab[h.k])}
@@ -1638,9 +1638,10 @@ const LOOK=[
   ['fis3','Postura: barbilla atrás (chin tucks), hombros abajo y atrás, pecho alto. Con 1,98, bien erguido impone.']]},
  {h:'2. Pelo',items:[
   ['pel1','Dejarlo crecer hasta tapar media oreja, ondulado y suelto (estilo Paul Walker). Unos 3-4 meses.'],
-  ['pel2','En la peluquería, cada 6-8 semanas: «No me toques arriba ni los lados, límpiame la nuca, perfila las orejas y quítame volumen con capas».'],
+  ['pel2','En la peluquería, cada 6-8 semanas, a tijera: «Corte para rizo, capas largas arriba y flequillo texturizado que caiga hacia delante. Laterales a tijera tapando media oreja, sin rapar. Nuca limpia y natural». Enséñale la foto.'],
   ['pel3','Champú solo lunes y jueves (sin sulfatos). Los demás días, agua y acondicionador si sudas.'],
-  ['pel4','Peinado de 1 minuto: con el pelo mojado, crema de rizos o espuma, estrujar hacia arriba y secar al aire. Nada de gomina ni efecto mojado.']]},
+  ['pel4','Rizo suelto, sin brillo y sin encrespar (3 min): 1) con el pelo empapado, sin secar, una nuez de crema de rizos repartida con los dedos; 2) encima, una bola de espuma del tamaño de una mandarina; 3) estruja hacia arriba con una camiseta de algodón (nunca toalla normal ni frotar); 4) no lo toques hasta que esté seco del todo, al aire o con difusor a temperatura baja; 5) ya seco, estrújalo con las manos para soltarlo y quitar el acartonado. Nada de gel, gomina ni cera brillante.'],
+  ['pel5','Antiencrespado: funda de almohada de satén, no peinar nunca en seco (solo dedos) y si un día se encrespa, moja las manos y vuelve a estrujar.']]},
  {h:'3. Piel y cara',items:[
   ['pie1','Mañana: limpiador suave + hidratante sin aceite + protector solar SPF 50 (lo que más compensa con el sol de Alicante).'],
   ['pie2','Noche: limpiador + hidratante. Funda de almohada limpia cada 2-3 días.'],
