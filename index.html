@@ -959,9 +959,10 @@ function cadenceTxt(x){const c=cad();return x<c.a-5?'Suave: acelera un poco':x<=
 /* Meta de pasos: la misma todos los días, editable en Plan. */
 function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
 function stepsWeek(k=ui.cur){const m=monday(k),v=[];for(let i=0;i<7;i++){const dk2=add(m,i);if(dk2>TODAY)break;const d=peek(dk2);if(d&&d.steps>0)v.push(d.steps)}return{n:v.length,avg:v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}}
+const STEP_EQ=`<table class="t small" style="margin-top:4px"><tr><th>Te faltan</th><th class="r">Cinta 8-10 %</th><th class="r">Bici moderada</th><th class="r">Andar</th></tr>${[2000,4000,6000,8000].map(n=>`<tr><td class="num">${th(n)}</td><td class="r">${n/200} min</td><td class="r">${Math.round(n/150/5)*5} min</td><td class="r">${n/100} min</td></tr>`).join('')}</table><p class="small muted" style="margin:4px 0 0">Cinta: 1 min ≈ 200 pasos · Bici moderada: 1 min ≈ 150 · Andar por la calle: 1 min ≈ 100.</p>`;
 function stepsCard(){const t=stepTarget(),w=stepsWeek();return `<section class="card stack"><div class="spread"><h2>Pasos</h2><span class="chip num">${th(t*7)} a la semana</span></div>
   <div class="kpis"><div class="kpi"><b class="num">${th(t)}</b><span>media ideal al día</span></div><div class="kpi"><b class="num" style="color:${w.avg==null?'inherit':w.avg>=t?'var(--ok)':'var(--warn)'}">${w.avg!=null?th(w.avg):'—'}</b><span>tu media esta semana${w.n?' ('+w.n+' d)':''}</span></div></div>
-  <p class="muted small" style="margin:0">Como tú quieras: lo que cuenta es la media de la semana. Bici moderada: 1 min = 150 pasos. Cinta con 6-8 % de pendiente: 30 min ≈ 6.000. Apunta el total en Hoy.</p></section>`}
+  <p class="muted small" style="margin:0">Como tú quieras: lo que cuenta es la media de la semana. Apunta el total en Hoy.</p>${STEP_EQ}</section>`}
 
 /* ================= MENÚ ================= */
 /* Cada día cubre fibra, calcio, zinc y omega-3: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
@@ -1166,7 +1167,7 @@ function vHoy(){
         <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
         <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
       </div>
-      ${d.steps!=null&&d.steps<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-d.steps)}</b> pasos: <b>${Math.ceil((stepTarget()-d.steps)/200/5)*5} min de cinta</b> al 8-10 % de pendiente y 5,5-6 km/h, sin agarrarte. Hazlos al acabar el entreno.</div>`:''}
+      ${d.steps!=null&&d.steps<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-d.steps)}</b> pasos: <b>${Math.ceil((stepTarget()-d.steps)/200/5)*5} min de cinta</b> al 8-10 % y 5,5-6 km/h sin agarrarte, o <b>${Math.ceil((stepTarget()-d.steps)/150/5)*5} min de bici</b> a ritmo moderado. Hazlos al acabar el entreno.</div>`:''}
       <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
     </section>
     <section class="card stack">
@@ -1518,6 +1519,7 @@ function vEntreno(){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
       <p class="small muted" style="margin:0">${esc(R.focus)}. Deja 1-2 repeticiones en reserva en cada serie.</p>
       <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+warmCard(type)+routinePlan();
+    html+=`<section class="card"><details><summary>Pasos que faltan: cinta, bici o andar</summary>${STEP_EQ}</details></section>`;
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso (en iPhone pausa la música)')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
