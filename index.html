@@ -546,92 +546,92 @@ const SHOP={
 /* [clave, nombre, series, repsMin, repsMax, descanso s, subida kg, alternativas, unidad] */
 const BASE_R={
  torsoA:{n:'Torso A · Anchura',focus:'Pecho, espalda ancha, hombro lateral y cuello',ex:[
-  ['pressInc','Press inclinado con mancuernas (banco 30°)',4,6,10,150,2,['Press inclinado en máquina','Press inclinado en multipower']],
+  ['pressInc','Press inclinado con mancuernas (banco 30°)',4,6,10,120,2,['Press inclinado en máquina','Press inclinado en multipower']],
   ['jalon','Jalón al pecho, agarre neutro',4,8,12,120,2.5,['Dominadas asistidas','Jalón a una mano en polea']],
-  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas','Elevación lateral tumbado de lado']],
+  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,60,1,['Elevaciones laterales con mancuernas','Elevación lateral tumbado de lado']],
   ['remoPecho','Remo con pecho apoyado',3,8,12,120,2.5,['Remo en máquina','Remo con mancuerna a una mano']],
-  ['aperPecho','Aperturas en máquina (contractora)',3,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
-  ['curl','Curl de bíceps en polea',3,10,15,90,1,['Curl inclinado con mancuernas','Curl en banco Scott']],
-  ['triCuerda','Extensión de tríceps con cuerda',2,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
+  ['aperPecho','Aperturas en máquina (contractora)',3,10,15,60,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
+  ['curl','Curl de bíceps en polea',3,10,15,60,1,['Curl inclinado con mancuernas','Curl en banco Scott']],
+  ['triCuerda','Extensión de tríceps con cuerda',2,10,15,60,1,['Extensión de tríceps sobre la cabeza en polea']],
   ['neck','Flexión de cuello tumbado (disco en la frente)',2,15,20,60,1.25,['Flexión de cuello con banda elástica']],
-  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]},
  piernaA:{n:'Pierna A + hombro',focus:'Cuádriceps, femoral, hombro y abdomen',ex:[
-  ['hackA','Sentadilla hack',4,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
-  ['rumano','Peso muerto rumano',3,8,10,150,2.5,['Peso muerto rumano con mancuernas','Hiperextensiones con peso']],
-  ['femSent','Curl femoral sentado',3,10,15,90,2.5,['Curl femoral tumbado']],
-  ['cuadri','Extensiones de cuádriceps',2,12,15,90,2.5,[]],
-  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Pájaros en polea cruzada','Face pull']],
-  ['gemelo','Gemelos en máquina',3,10,15,90,2.5,['Gemelos en prensa']],
+  ['hackA','Sentadilla hack',4,6,10,150,5,['Prensa inclinada','Sentadilla en multipower']],
+  ['rumano','Peso muerto rumano',3,8,10,120,2.5,['Peso muerto rumano con mancuernas','Hiperextensiones con peso']],
+  ['femSent','Curl femoral sentado',3,10,15,60,2.5,['Curl femoral tumbado']],
+  ['cuadri','Extensiones de cuádriceps',2,12,15,60,2.5,[]],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['aperInv','Aperturas inversas en máquina',3,12,20,60,1,['Pájaros en polea cruzada','Face pull']],
+  ['gemelo','Gemelos en máquina',3,10,15,60,2.5,['Gemelos en prensa']],
   ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']],
-  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]},
  torsoB:{n:'Torso B · Espalda y hombro',focus:'Espalda ancha, pecho, hombros redondos, brazos y cuello',ex:[
-  ['dominada','Dominadas asistidas o jalón agarre ancho',4,6,10,150,2.5,['Jalón al pecho agarre ancho']],
+  ['dominada','Dominadas asistidas o jalón agarre ancho',4,6,10,120,2.5,['Jalón al pecho agarre ancho']],
   ['pressMaq','Press de pecho inclinado en máquina',4,8,12,120,2.5,['Press de banca con mancuernas']],
   ['remoPolea','Remo en polea sentado, codos pegados',3,10,12,120,2.5,['Remo en máquina']],
   ['pressHombro','Press de hombro en máquina',3,8,12,120,2.5,['Press militar con mancuernas sentado']],
-  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['aperPecho','Aperturas en máquina (contractora)',2,10,15,90,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
-  ['curlInc','Curl inclinado con mancuernas',3,8,12,90,1,['Curl bayesian en polea']],
-  ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,90,1,['Press francés con barra Z']],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['aperPecho','Aperturas en máquina (contractora)',2,10,15,60,2.5,['Aperturas en polea cruzada','Aperturas con mancuernas']],
+  ['curlInc','Curl inclinado con mancuernas',3,8,12,60,1,['Curl bayesian en polea']],
+  ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,60,1,['Press francés con barra Z']],
   ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']],
-  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]},
  hombroX:{n:'Hombro, brazos y postura',focus:'Hombros anchos, brazos, abdomen y cuello en su sitio',ex:[
-  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,90,1,['Aperturas inversas en máquina']],
+  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,60,1,['Aperturas inversas en máquina']],
   ['fondos','Fondos asistidos',3,8,12,120,2.5,['Press cerrado en máquina']],
-  ['curlMartillo','Curl martillo',3,10,15,90,1,['Curl martillo en polea con cuerda']],
-  ['triCuerda','Extensión de tríceps con cuerda',3,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
-  ['curl','Curl de bíceps en polea',2,10,15,90,1,['Curl inclinado con mancuernas']],
+  ['curlMartillo','Curl martillo',3,10,15,60,1,['Curl martillo en polea con cuerda']],
+  ['triCuerda','Extensión de tríceps con cuerda',3,10,15,60,1,['Extensión de tríceps sobre la cabeza en polea']],
+  ['curl','Curl de bíceps en polea',2,10,15,60,1,['Curl inclinado con mancuernas']],
   ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
-  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]},
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]},
  fbA:{n:'Cuerpo completo A',focus:'Pierna, pecho alto, espalda y hombro',ex:[
-  ['hackA','Sentadilla hack',3,6,10,180,5,['Prensa inclinada','Sentadilla en multipower']],
-  ['pressInc','Press inclinado con mancuernas (banco 30°)',3,6,10,150,2,['Press inclinado en máquina']],
+  ['hackA','Sentadilla hack',3,6,10,150,5,['Prensa inclinada','Sentadilla en multipower']],
+  ['pressInc','Press inclinado con mancuernas (banco 30°)',3,6,10,120,2,['Press inclinado en máquina']],
   ['jalon','Jalón al pecho, agarre neutro',3,8,12,120,2.5,['Dominadas asistidas']],
-  ['rumano','Peso muerto rumano',3,8,10,150,2.5,['Peso muerto rumano con mancuernas']],
-  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['curl','Curl de bíceps en polea',2,10,15,90,1,['Curl inclinado con mancuernas']],
-  ['triCuerda','Extensión de tríceps con cuerda',2,10,15,90,1,['Extensión de tríceps sobre la cabeza en polea']],
+  ['rumano','Peso muerto rumano',3,8,10,120,2.5,['Peso muerto rumano con mancuernas']],
+  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['curl','Curl de bíceps en polea',2,10,15,60,1,['Curl inclinado con mancuernas']],
+  ['triCuerda','Extensión de tríceps con cuerda',2,10,15,60,1,['Extensión de tríceps sobre la cabeza en polea']],
   ['neck','Flexión de cuello tumbado (disco en la frente)',2,15,20,60,1.25,['Flexión de cuello con banda elástica']]]},
  fbB:{n:'Cuerpo completo B',focus:'Pierna, hombro, espalda media y abdomen',ex:[
-  ['prensaB','Prensa',3,10,15,150,5,['Sentadilla hack']],
+  ['prensaB','Prensa',3,10,15,120,5,['Sentadilla hack']],
   ['pressHombro','Press de hombro en máquina',3,8,12,120,2.5,['Press militar con mancuernas sentado']],
   ['remoPecho','Remo con pecho apoyado',3,8,12,120,2.5,['Remo en máquina']],
-  ['femSent','Curl femoral sentado',3,10,15,90,2.5,['Curl femoral tumbado']],
-  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Face pull']],
+  ['femSent','Curl femoral sentado',3,10,15,60,2.5,['Curl femoral tumbado']],
+  ['lateral','Elevaciones laterales en polea o máquina',4,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['aperInv','Aperturas inversas en máquina',3,12,20,60,1,['Face pull']],
   ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
   ['neckExt','Extensión de cuello tumbado boca abajo (disco en la nuca)',2,15,20,60,1.25,['Extensión de cuello con banda elástica']]]},
  fbC:{n:'Cuerpo completo C',focus:'Pierna a una pierna, pecho, espalda ancha y brazos',ex:[
   ['bulgara','Sentadilla búlgara con mancuernas',3,8,12,120,2,['Zancadas en multipower']],
   ['pressMaq','Press de pecho inclinado en máquina',3,8,12,120,2.5,['Press de banca con mancuernas']],
-  ['dominada','Dominadas asistidas o jalón agarre ancho',3,6,10,150,2.5,['Jalón al pecho agarre ancho']],
-  ['femTumb','Curl femoral tumbado',3,10,15,90,2.5,['Curl femoral sentado']],
-  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['curlInc','Curl inclinado con mancuernas',2,8,12,90,1,['Curl bayesian en polea']],
-  ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,90,1,['Press francés con barra Z']],
+  ['dominada','Dominadas asistidas o jalón agarre ancho',3,6,10,120,2.5,['Jalón al pecho agarre ancho']],
+  ['femTumb','Curl femoral tumbado',3,10,15,60,2.5,['Curl femoral sentado']],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['curlInc','Curl inclinado con mancuernas',2,8,12,60,1,['Curl bayesian en polea']],
+  ['triFrances','Extensión de tríceps sobre la cabeza en polea',2,8,12,60,1,['Press francés con barra Z']],
   ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']]]},
  gluteX:{n:'Glúteo y hombro · día extra',focus:'Glúteo, cintura y hombros',ex:[
   ['hip','Hip thrust',4,8,12,120,5,['Puente de glúteo en máquina']],
-  ['patada','Patada de glúteo en polea',3,12,15,90,1,['Patada de glúteo en máquina']],
-  ['abductor','Abductores en máquina',3,12,20,90,2.5,['Abducción con banda']],
+  ['patada','Patada de glúteo en polea',3,12,15,60,1,['Patada de glúteo en máquina']],
+  ['abductor','Abductores en máquina',3,12,20,60,2.5,['Abducción con banda']],
   ['bulgara','Sentadilla búlgara con mancuernas',3,8,12,120,2,['Zancadas en multipower']],
-  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
   ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']]]},
  piernaB:{n:'Pierna B + hombro',focus:'Piernas completas, hombro trasero y abdomen',ex:[
-  ['prensaB','Prensa',4,10,15,150,5,['Sentadilla hack']],
+  ['prensaB','Prensa',4,10,15,120,5,['Sentadilla hack']],
   ['bulgara','Sentadilla búlgara con mancuernas',3,8,12,120,2,['Zancadas en multipower']],
-  ['femTumb','Curl femoral tumbado',3,10,15,90,2.5,['Curl femoral sentado']],
-  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,90,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,90,1,['Face pull']],
-  ['gemelo','Gemelos en máquina',3,10,15,90,2.5,['Gemelos en prensa']],
+  ['femTumb','Curl femoral tumbado',3,10,15,60,2.5,['Curl femoral sentado']],
+  ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
+  ['aperInv','Aperturas inversas en máquina',3,12,20,60,1,['Face pull']],
+  ['gemelo','Gemelos en máquina',3,10,15,60,2.5,['Gemelos en prensa']],
   ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
-  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza',2,10,10,30,0,['Chin tucks tumbado boca arriba']]]}
+  ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]}
 };
 const ROUTINE={};
 const LEGDAYS=['piernaA','piernaB','fbA','fbB','fbC'];
-const HIP_EX=['hip','Hip thrust',4,8,12,120,5,['Puente de glúteo en máquina']],ABD_EX=['abductor','Abductores en máquina',3,12,20,90,2.5,['Abducción con banda']];
+const HIP_EX=['hip','Hip thrust',4,8,12,120,5,['Puente de glúteo en máquina']],ABD_EX=['abductor','Abductores en máquina',3,12,20,60,2.5,['Abducción con banda']];
 function rebuildRoutine(){
   const s=state.settings,f=s.sex==='f',g=s.focus==='glute';
   for(const k in ROUTINE)delete ROUTINE[k];
@@ -946,7 +946,7 @@ function suggest(ex,k){
   if(allMax)return{kg:+(top+ex.inc).toFixed(1),up:true,txt:`Hiciste ${ex.max} en todas las series. Sube a ${kgs(top+ex.inc)} kg y vuelve a empezar desde ${ex.min}.`};
   return{kg:top,txt:`Última vez ${kgs(top)} kg: ${last}. Mismo peso, busca +1 rep.`};
 }
-function liftMin(R){return Math.round(8+R.ex.reduce((a,e)=>a+e[2]*(e[5]+45),0)/60)}
+function liftMin(R){return Math.round(4+R.ex.reduce((a,e)=>a+e[2]*(e[5]+45),0)/60)}
 function cintaMin(R){return 0} /* sin cinta: los pasos los controla él */
 function sessionMin(R){return liftMin(R)}
 function dayTotalMin(R){const s=state.settings;return R?(s.commute||0)+liftMin(R)+cintaMin(R):(s.walkMin||80)}
@@ -1500,13 +1500,13 @@ function vShop(){
 
 /* Calentamiento exacto por sesión (~8 min, incluido en la duración) */
 const WARM={
- torsoA:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Aperturas inversas en máquina, muy ligeras','1 × 15'],['Rotación externa en polea, muy ligera','1 × 12 cada brazo'],['Press inclinado: series de aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
- torsoB:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Aperturas inversas en máquina, muy ligeras','1 × 15'],['Colgarte de la barra de dominadas','2 × 20 s'],['Dominadas: aproximación con mucha asistencia','1 × 8'],['Antes del press: aproximación','1 × 10 al 50 % del peso de hoy']],
- piernaA:[['Bici estática','5 min, subiendo el ritmo'],['Sentadilla sin peso, lenta','1 × 10'],['Balanceo de pierna adelante y atrás, agarrado a algo','10 por pierna'],['Puente de glúteo en el suelo','1 × 12'],['Sentadilla hack: series de aproximación','1 × 10 al 40 %, 1 × 6 al 65 % y 1 × 3 al 85 % del peso de hoy']],
- piernaB:[['Bici estática','5 min, subiendo el ritmo'],['Sentadilla sin peso, lenta','1 × 10'],['Zancadas sin peso','8 por pierna'],['Puente de glúteo en el suelo','1 × 12'],['Prensa: series de aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
- hombroX:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Rotación externa en polea, muy ligera','1 × 12 cada brazo'],['Elevaciones laterales muy ligeras','1 × 15'],['Fondos: aproximación con mucha asistencia','1 × 8']]
+ torsoA:[['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Press inclinado: aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
+ torsoB:[['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Dominadas: aproximación con mucha asistencia','1 × 8']],
+ piernaA:[['Sentadilla sin peso, lenta','1 × 10'],['Sentadilla hack: aproximación','1 × 10 al 40 %, 1 × 6 al 65 % y 1 × 3 al 85 % del peso de hoy']],
+ piernaB:[['Sentadilla sin peso, lenta','1 × 10'],['Prensa: aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
+ hombroX:[['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Elevaciones laterales muy ligeras','1 × 15']]
 };
-function warmCard(t){const w=WARM[t];if(!w)return '';return `<section class="card"><details open><summary>Calentamiento · 8 min</summary><div style="margin-top:8px">${w.map(([a,b],i)=>`<div class="spread small" style="padding:7px 0;${i?'border-top:1px solid var(--line)':''}"><span>${i+1}. ${esc(a)}</span><b class="num" style="text-align:right">${esc(b)}</b></div>`).join('')}</div><p class="small muted" style="margin:8px 0 0">Las series de aproximación no se apuntan. Después empieza con la primera serie de verdad.</p></details></section>`}
+function warmCard(t){const w=WARM[t];if(!w)return '';return `<section class="card"><details open><summary>Calentamiento · 4 min</summary><div style="margin-top:8px">${w.map(([a,b],i)=>`<div class="spread small" style="padding:7px 0;${i?'border-top:1px solid var(--line)':''}"><span>${i+1}. ${esc(a)}</span><b class="num" style="text-align:right">${esc(b)}</b></div>`).join('')}</div><p class="small muted" style="margin:8px 0 0">Nada más: la bici y los estiramientos largos no te dan más músculo. Las aproximaciones no se apuntan. En el primer ejercicio de cada grupo muscular nuevo, haz 1 serie ligera de 8 antes.</p></details></section>`}
 function vEntreno(){
   const d=day(),type=dayType(),R=ROUTINE[type],bi=blockInfo();
   let html='';
