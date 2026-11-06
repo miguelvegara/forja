@@ -1506,6 +1506,14 @@ const WARM={
  hombroX:[['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Elevaciones laterales muy ligeras','1 × 15']]
 };
 function warmCard(t){const w=WARM[t];if(!w)return '';return `<section class="card"><details open><summary>Calentamiento · 4 min</summary><div style="margin-top:8px">${w.map(([a,b],i)=>`<div class="spread small" style="padding:7px 0;${i?'border-top:1px solid var(--line)':''}"><span>${i+1}. ${esc(a)}</span><b class="num" style="text-align:right">${esc(b)}</b></div>`).join('')}</div><p class="small muted" style="margin:8px 0 0">Nada más: la bici y los estiramientos largos no te dan más músculo. Las aproximaciones no se apuntan. En el primer ejercicio de cada grupo muscular nuevo, haz 1 serie ligera de 8 antes.</p></details></section>`}
+function cintaCard(d){const t=stepTarget(),s=d.steps,miss=s!=null?Math.max(0,t-s):null,m=miss!=null?Math.ceil(miss/200/5)*5:null;
+  const wk=Math.floor((pk(ui.cur)-pk(state.settings.progStart||TODAY))/(7*864e5)),inc=wk<2?6:wk<4?8:10;
+  return `<section class="card stack"><div class="spread"><h3>Pasos y cinta</h3><span class="chip num">meta ${th(t)}</span></div>
+  <div class="field"><label for="st-ent">Pasos que llevas hoy</label><input class="inp" id="st-ent" inputmode="numeric" data-f="steps" value="${s!=null?s:''}" placeholder="mira la app Salud"></div>
+  ${miss==null?'<p class="small muted" style="margin:0">Apunta los pasos al acabar las pesas y te digo cuánta cinta hacer.</p>'
+   :miss===0?'<div class="callout ok small">Ya llegas a tus pasos. Nada de cinta hoy: a casa.</div>'
+   :`<div class="callout small">Te faltan <b class="num">${th(miss)}</b> pasos. En la cinta:<div class="kpis" style="margin-top:8px"><div class="kpi"><b class="num">${m}</b><span>minutos</span></div><div class="kpi"><b class="num">${inc} %</b><span>pendiente</span></div><div class="kpi"><b class="num">5,5</b><span>km/h</span></div></div><span class="muted">Sin agarrarte a la barra. Si te cuesta mucho, baja 1-2 % la pendiente. Si te sobra, sube a 6 km/h.</span></div>`}
+  <details><summary class="small">Otras opciones: bici o andar</summary>${STEP_EQ}</details></section>`}
 function vEntreno(){
   const d=day(),type=dayType(),R=ROUTINE[type],bi=blockInfo();
   let html='';
@@ -1514,7 +1522,6 @@ function vEntreno(){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
       <p class="small muted" style="margin:0">${esc(R.focus)}. Deja 1-2 repeticiones en reserva en cada serie.</p>
       <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+warmCard(type)+routinePlan();
-    html+=`<section class="card"><details><summary>Pasos que faltan: cinta, bici o andar</summary>${STEP_EQ}</details></section>`;
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso (en iPhone pausa la música)')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
@@ -1551,7 +1558,7 @@ function vEntreno(){
   }
   if(!R)html+=stepsCard();
   if(type==='rest')html=`<section class="card"><h2>Descanso</h2><p class="muted small" style="margin:6px 0 0">Hoy no toca nada.</p></section>`+html;
-  return header()+`<div class="stack"><section class="card">${dayStrip()}</section>${typeSel}${html}</div>`;
+  return header()+`<div class="stack"><section class="card">${dayStrip()}</section>${typeSel}${html}${R?cintaCard(d):''}</div>`;
 }
 
 function weightChart(){
