@@ -952,8 +952,11 @@ function cad(){const s=state.settings;const a=s.cadMin||100,b=Math.max(a,s.cadMa
 function walkPlan(k=ui.cur){const tgt=stepTarget(k),st=Math.max(2000,tgt-LIFE_STEPS),c=cad().mid;const km=st*stride()/1000;return{tgt,steps:Math.round(st/500)*500,km,min:Math.round(st/c/5)*5,kmh:c*stride()*60/1000}}
 function cadenceTxt(x){const c=cad();return x<c.a-5?'Suave: acelera un poco':x<=c.b+5?'Ritmo ideal':'Rápido: también vale'}
 /* Meta de pasos: la misma todos los días, editable en Plan. */
+/* Pasos equivalentes: el móvil cuenta ~110 pasos/min en la cinta, pero con pendiente el gasto equivale a ~200. Se suman ~90 extra por minuto. */
+const CINTA_EXTRA=90;
+function effSteps(d){return d&&d.steps!=null?d.steps+(d.cinta||0)*CINTA_EXTRA:null}
 function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
-function stepsWeek(k=ui.cur){const m=monday(k),v=[];for(let i=0;i<7;i++){const dk2=add(m,i);if(dk2>TODAY)break;const d=peek(dk2);if(d&&d.steps>0)v.push(d.steps)}return{n:v.length,avg:v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}}
+function stepsWeek(k=ui.cur){const m=monday(k),v=[];for(let i=0;i<7;i++){const dk2=add(m,i);if(dk2>TODAY)break;const d=peek(dk2);if(d&&d.steps>0)v.push(effSteps(d))}return{n:v.length,avg:v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}}
 const STEP_EQ=`<table class="t small" style="margin-top:4px"><tr><th>Te faltan</th><th class="r">Cinta 8-10 %</th><th class="r">Bici moderada</th><th class="r">Andar</th></tr>${[2000,4000,6000,8000].map(n=>`<tr><td class="num">${th(n)}</td><td class="r">${n/200} min</td><td class="r">${Math.round(n/150/5)*5} min</td><td class="r">${n/100} min</td></tr>`).join('')}</table><p class="small muted" style="margin:4px 0 0">Cinta: 1 min ≈ 200 pasos · Bici moderada: 1 min ≈ 150 · Andar por la calle: 1 min ≈ 100.</p>`;
 function stepsCard(){const t=stepTarget(),w=stepsWeek();return `<section class="card stack"><div class="spread"><h2>Pasos</h2><span class="chip num">${th(t*7)} a la semana</span></div>
   <div class="kpis"><div class="kpi"><b class="num">${th(t)}</b><span>media ideal al día</span></div><div class="kpi"><b class="num" style="color:${w.avg==null?'inherit':w.avg>=t?'var(--ok)':'var(--warn)'}">${w.avg!=null?th(w.avg):'—'}</b><span>tu media esta semana${w.n?' ('+w.n+' d)':''}</span></div></div>
@@ -1048,7 +1051,7 @@ const HAB=[
  {g:'Al levantarte',k:'pelo',n:'Pelo: espuma con el pelo húmedo y difusor'},
  {g:'Al levantarte',k:'crea',n:'Desayuno del menú con la creatina (5 g) en la leche'},
  {g:'Durante el día',k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
- {g:'Durante el día',k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
+ {g:'Durante el día',k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&effSteps(d)>=stepTarget(k))},
  {g:'Durante el día',k:'chinwk',n:'Chin tucks 2 × 10 en el coche (cabeza contra el reposacabezas) o en casa'},
  {g:'Durante el día',k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'},
  {g:'Por la noche',k:'menu',n:'Cena del menú'},
@@ -1162,7 +1165,7 @@ function vHoy(){
         <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
         <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
       </div>
-      ${d.steps!=null&&d.steps<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-d.steps)}</b> pasos: <b>${Math.ceil((stepTarget()-d.steps)/200/5)*5} min de cinta</b> al 8-10 % y 5,5-6 km/h sin agarrarte, o <b>${Math.ceil((stepTarget()-d.steps)/150/5)*5} min de bici</b> a ritmo moderado. Hazlos al acabar el entreno.</div>`:''}
+      ${d.steps!=null&&effSteps(d)<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-effSteps(d))}</b> pasos: <b>${Math.ceil((stepTarget()-effSteps(d))/200/5)*5} min de cinta</b> al 8-10 % y 5,5-6 km/h sin agarrarte, o <b>${Math.ceil((stepTarget()-effSteps(d))/150/5)*5} min de bici</b> a ritmo moderado. Hazlos al acabar el entreno.</div>`:''}
       <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
     </section>
     <section class="card stack">
@@ -1506,11 +1509,12 @@ const WARM={
  hombroX:[['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Elevaciones laterales muy ligeras','1 × 15']]
 };
 function warmCard(t){const w=WARM[t];if(!w)return '';return `<section class="card"><details open><summary>Calentamiento · 4 min</summary><div style="margin-top:8px">${w.map(([a,b],i)=>`<div class="spread small" style="padding:7px 0;${i?'border-top:1px solid var(--line)':''}"><span>${i+1}. ${esc(a)}</span><b class="num" style="text-align:right">${esc(b)}</b></div>`).join('')}</div><p class="small muted" style="margin:8px 0 0">Nada más: la bici y los estiramientos largos no te dan más músculo. Las aproximaciones no se apuntan. En el primer ejercicio de cada grupo muscular nuevo, haz 1 serie ligera de 8 antes.</p></details></section>`}
-function cintaCard(d){const t=stepTarget(),s=d.steps,miss=s!=null?Math.max(0,t-s):null,m=miss!=null?Math.ceil(miss/200/5)*5:null;
+function cintaCard(d){const t=stepTarget(),s=d.steps,e=effSteps(d),miss=s!=null?Math.max(0,t-e):null,m=miss!=null?Math.ceil(miss/200/5)*5:null;
   const wk=Math.floor((pk(ui.cur)-pk(state.settings.progStart||TODAY))/(7*864e5)),inc=wk<2?6:wk<4?8:10;
   return `<section class="card stack"><div class="spread"><h3>Pasos y cinta</h3><span class="chip num">meta ${th(t)}</span></div>
-  <div class="field"><label for="st-ent">Pasos que llevas hoy</label><input class="inp" id="st-ent" inputmode="numeric" data-f="steps" value="${s!=null?s:''}" placeholder="mira la app Salud"></div>
-  ${miss==null?'<p class="small muted" style="margin:0">Apunta los pasos al acabar las pesas y te digo cuánta cinta hacer.</p>'
+  <div class="grid2"><div class="field"><label for="st-ent">Pasos del móvil</label><input class="inp" id="st-ent" inputmode="numeric" data-f="steps" value="${s!=null?s:''}" placeholder="app Salud"></div><div class="field"><label for="ci-ent">Min de cinta hechos</label><input class="inp" id="ci-ent" inputmode="numeric" data-f="cinta" value="${d.cinta!=null?d.cinta:''}" placeholder="0"></div></div>
+  ${d.cinta?`<p class="small muted" style="margin:0">Con la pendiente, tus ${d.cinta} min cuentan como si hubieras andado <b>${th(d.cinta*200)}</b> pasos. Total equivalente: <b class="num">${th(e)}</b>.</p>`:''}
+  ${miss==null?'<p class="small muted" style="margin:0">Apunta los pasos del móvil al acabar las pesas y te digo cuánta cinta hacer. Al terminar la cinta, apunta los minutos: con la pendiente cuentan doble.</p>'
    :miss===0?'<div class="callout ok small">Ya llegas a tus pasos. Nada de cinta hoy: a casa.</div>'
    :`<div class="callout small">Te faltan <b class="num">${th(miss)}</b> pasos. En la cinta:<div class="kpis" style="margin-top:8px"><div class="kpi"><b class="num">${m}</b><span>minutos</span></div><div class="kpi"><b class="num">${inc} %</b><span>pendiente</span></div><div class="kpi"><b class="num">5,5</b><span>km/h</span></div></div><span class="muted">Sin agarrarte a la barra. Si te cuesta mucho, baja 1-2 % la pendiente. Si te sobra, sube a 6 km/h.</span></div>`}
   <details><summary class="small">Otras opciones: bici o andar</summary>${STEP_EQ}</details></section>`}
