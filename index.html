@@ -1166,6 +1166,7 @@ function vHoy(){
         <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
         <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
       </div>
+      ${d.steps!=null&&d.steps<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-d.steps)}</b> pasos: <b>${Math.ceil((stepTarget()-d.steps)/200/5)*5} min de cinta</b> al 8-10 % de pendiente y 5,5-6 km/h, sin agarrarte. Hazlos al acabar el entreno.</div>`:''}
       <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
     </section>
     <section class="card stack">
@@ -1733,7 +1734,7 @@ const FAST=[
  {h:'1. Pasos y cardio',items:[
   ['pa1','10.000 pasos de media al día, en todas las fases. Si en definición te estancas 3 semanas, súbelos a 12.000 antes de comer menos.'],
   ['pa2','Bici moderada (puedes hablar pero notas el esfuerzo): 1 min = 150 pasos. 10 min ≈ 1.500, 30 min ≈ 4.500, 1 h ≈ 9.000. Suave: 100 por minuto; fuerte: 200. Súmalos tú a los pasos del día.'],
-  ['pa3','Cinta: 6-8 % de pendiente a 5-5,5 km/h, sin agarrarte. 30 min ≈ 6.000 pasos (en llano solo ≈ 3.500).'],
+  ['pa3','La forma más rápida de completar pasos: cinta al 8-10 % de pendiente a 5,5-6 km/h, sin agarrarte, al acabar el entreno. 1 min ≈ 200 pasos: 20 min ≈ 4.000, 30 min ≈ 6.000. En Hoy, la app te dice cuántos minutos te faltan.'],
   ['pa4','Pasos sin perder tiempo: llamadas andando, aparcar lejos, escaleras y 10-15 min andando después de comer y de cenar (≈ 3.000-4.000 pasos, y digieres mejor).']]},
  {h:'2. Gym',items:[
   ['gy1','Ve en horas valle (antes de las 18:00 o después de las 21:00): máquinas libres y sin esperas.'],
