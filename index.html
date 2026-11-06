@@ -561,7 +561,7 @@ const BASE_R={
   ['femSent','Curl femoral sentado',3,10,15,60,2.5,['Curl femoral tumbado']],
   ['cuadri','Extensiones de cuádriceps',2,12,15,60,2.5,[]],
   ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,60,1,['Pájaros en polea cruzada','Face pull']],
+  ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,60,1,['Aperturas inversas en máquina']],
   ['gemelo','Gemelos en máquina',3,10,15,60,2.5,['Gemelos en prensa']],
   ['piernasColgado','Elevaciones de piernas colgado',3,10,15,60,0,['Crunch en polea']],
   ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]},
@@ -624,7 +624,7 @@ const BASE_R={
   ['bulgara','Sentadilla búlgara con mancuernas',3,8,12,120,2,['Zancadas en multipower']],
   ['femTumb','Curl femoral tumbado',3,10,15,60,2.5,['Curl femoral sentado']],
   ['lateral','Elevaciones laterales en polea o máquina',3,12,20,60,1,['Elevaciones laterales con mancuernas']],
-  ['aperInv','Aperturas inversas en máquina',3,12,20,60,1,['Face pull']],
+  ['facePull','Face pull en polea con cuerda (codos altos, tira hacia la frente)',3,12,20,60,1,['Aperturas inversas en máquina']],
   ['gemelo','Gemelos en máquina',3,10,15,60,2.5,['Gemelos en prensa']],
   ['crunch','Crunch en polea',3,10,15,60,2.5,['Elevaciones de piernas colgado']],
   ['chinTuck','Chin tucks: barbilla atrás 5 s, sin bajar la cabeza (hazlos durante el descanso del ejercicio anterior)',2,10,10,0,0,['Chin tucks tumbado boca arriba']]]}
@@ -1053,6 +1053,7 @@ const HAB=[
  {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
  {k:'crea',n:'Creatina (5 g)'},
  {k:'piel',n:'Piel: limpiador, hidratante y protector solar por la mañana'},
+ {k:'chinwk',n:'Sábado y domingo: chin tucks 2 × 10',auto:(d,k)=>{const w=pk(k).getDay();return w!==0&&w!==6}},
  {k:'pelo',n:'Pelo: crema de rizos + espuma con el pelo empapado, estrujar con camiseta y no tocarlo hasta que seque'},
  {k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'}
 ];
