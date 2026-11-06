@@ -1045,17 +1045,18 @@ const fmtH=h=>Math.floor(h)+' h '+String(Math.round((h%1)*60)).padStart(2,'0');
 function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk||(d.steps>=stepTarget(k));return false}
 /* Lo esencial: lo que más pesa para gustar (cuerpo, cara, pelo y trato). Nada más. */
 const HAB=[
- {k:'peso',n:'Pesarte en ayunas, tras el baño',auto:d=>!!(d&&d.weight)},
- {k:'medir',n:'Lunes: medir cintura y cuello',auto:(d,k)=>{if(pk(k).getDay()!==1){const lm=lastMeasure();return !!lm&&lm.k>add(k,-8)}return !!(d&&d.waist&&d.neck)}},
- {k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
- {k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
- {k:'menu',n:'Desayuno y cena del menú'},
- {k:'sleep',n:'Dormir 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
- {k:'crea',n:'Creatina (5 g)'},
- {k:'piel',n:'Piel: limpiador, hidratante y protector solar por la mañana'},
- {k:'chinwk',n:'Sábado y domingo: chin tucks 2 × 10',auto:(d,k)=>{const w=pk(k).getDay();return w!==0&&w!==6}},
- {k:'pelo',n:'Pelo: crema de rizos + espuma con el pelo empapado, estrujar con camiseta y no tocarlo hasta que seque'},
- {k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'}
+ {g:'Al levantarte',k:'sleep',n:'Anoche dormiste 7,5 h o más',auto:d=>{const h=sleepH(d);return h!=null&&h>=7.5}},
+ {g:'Al levantarte',k:'peso',n:'Pesarte en ayunas, tras el baño',auto:d=>!!(d&&d.weight)},
+ {g:'Al levantarte',k:'medir',n:'Lunes: medir cintura y cuello',auto:(d,k)=>{if(pk(k).getDay()!==1){const lm=lastMeasure();return !!lm&&lm.k>add(k,-8)}return !!(d&&d.waist&&d.neck)}},
+ {g:'Al levantarte',k:'piel',n:'Piel: limpiador, hidratante y protector solar'},
+ {g:'Al levantarte',k:'pelo',n:'Pelo: espuma con el pelo húmedo y difusor'},
+ {g:'Al levantarte',k:'crea',n:'Desayuno del menú con la creatina (5 g) en la leche'},
+ {g:'Durante el día',k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
+ {g:'Durante el día',k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
+ {g:'Durante el día',k:'social',n:'Hablar con alguien nuevo o hacer un plan con gente'},
+ {g:'Por la noche',k:'menu',n:'Cena del menú'},
+ {g:'Por la noche',k:'chinwk',n:'Sábado y domingo: chin tucks 2 × 10',auto:(d,k)=>{const w=pk(k).getDay();return w!==0&&w!==6}},
+ {g:'Por la noche',k:'cama',n:'A la cama a tu hora, móvil fuera de la habitación'}
 ];
 function habOn(h,d,k){if(h.auto)return h.auto(d,k);if(!d)return false;if(h.k==='crea')return!!d.crea;return!!(d.hab&&d.hab[h.k])}
 function habScore(k){const d=peek(k);return HAB.filter(h=>habOn(h,d,k)).length}
@@ -1169,7 +1170,7 @@ function vHoy(){
     </section>
     <section class="card stack">
       <div class="spread"><h3>Lo esencial</h3><span class="chip num ${sc>=HAB.length?'on':''}">${sc}/${HAB.length}</span></div>
-      <div>${HAB.map(h=>{const on=habOn(h,d,ui.cur);return `<div class="spread" style="padding:7px 0;border-top:1px solid var(--line)">
+      <div>${HAB.map((h,hi)=>{const on=habOn(h,d,ui.cur);return `${h.g&&(hi===0||HAB[hi-1].g!==h.g)?`<div class="eyebrow" style="margin-top:${hi?12:0}px;padding-bottom:4px">${esc(h.g)}</div>`:''}<div class="spread" style="padding:7px 0;border-top:1px solid var(--line)">
         <span style="min-width:0">${h.k==='steps'?'Pasos del día: <b class="num">'+th(stepTarget())+'</b>':esc(h.n)}</span>
         ${h.auto?`<span class="done ${on?'on':''}" style="width:36px;height:32px" aria-label="${on?'Hecho':'Pendiente'}">${ICON.check}</span>`
           :`<button class="done ${on?'on':''}" style="width:36px;height:32px" data-a="hab" data-v="${h.k}" aria-pressed="${on}" aria-label="${esc(h.n)}">${ICON.check}</button>`}
