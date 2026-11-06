@@ -1498,14 +1498,23 @@ function vShop(){
   </div>`;
 }
 
+/* Calentamiento exacto por sesión (~8 min, incluido en la duración) */
+const WARM={
+ torsoA:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Aperturas inversas en máquina, muy ligeras','1 × 15'],['Rotación externa en polea, muy ligera','1 × 12 cada brazo'],['Press inclinado: series de aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
+ torsoB:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Aperturas inversas en máquina, muy ligeras','1 × 15'],['Colgarte de la barra de dominadas','2 × 20 s'],['Dominadas: aproximación con mucha asistencia','1 × 8'],['Antes del press: aproximación','1 × 10 al 50 % del peso de hoy']],
+ piernaA:[['Bici estática','5 min, subiendo el ritmo'],['Sentadilla sin peso, lenta','1 × 10'],['Balanceo de pierna adelante y atrás, agarrado a algo','10 por pierna'],['Puente de glúteo en el suelo','1 × 12'],['Sentadilla hack: series de aproximación','1 × 10 al 40 %, 1 × 6 al 65 % y 1 × 3 al 85 % del peso de hoy']],
+ piernaB:[['Bici estática','5 min, subiendo el ritmo'],['Sentadilla sin peso, lenta','1 × 10'],['Zancadas sin peso','8 por pierna'],['Puente de glúteo en el suelo','1 × 12'],['Prensa: series de aproximación','1 × 10 al 50 % y 1 × 5 al 75 % del peso de hoy']],
+ hombroX:[['Bici estática suave','5 min'],['Estiramiento de pecho en el marco de una puerta','30 s cada lado'],['Rotación externa en polea, muy ligera','1 × 12 cada brazo'],['Elevaciones laterales muy ligeras','1 × 15'],['Fondos: aproximación con mucha asistencia','1 × 8']]
+};
+function warmCard(t){const w=WARM[t];if(!w)return '';return `<section class="card"><details open><summary>Calentamiento · 8 min</summary><div style="margin-top:8px">${w.map(([a,b],i)=>`<div class="spread small" style="padding:7px 0;${i?'border-top:1px solid var(--line)':''}"><span>${i+1}. ${esc(a)}</span><b class="num" style="text-align:right">${esc(b)}</b></div>`).join('')}</div><p class="small muted" style="margin:8px 0 0">Las series de aproximación no se apuntan. Después empieza con la primera serie de verdad.</p></details></section>`}
 function vEntreno(){
   const d=day(),type=dayType(),R=ROUTINE[type],bi=blockInfo();
   let html='';
   const typeSel=`<div class="row wrap">${Object.keys(TYPES).filter(t=>planTypes().includes(t)||t==='walk'||t==='rest'||t===type).map(t=>`<button class="chip ${t===type?'on':''}" data-a="type" data-v="${t}">${TYPES[t]}</button>`).join('')}</div>`;
   if(R){
     html+=`<section class="stack"><h1>${esc(R.n)}</h1>
-      <p class="small muted" style="margin:0">${esc(R.focus)}. Calentamiento: 5 min de bici, 30 s de estiramiento de pecho en el marco de una puerta y 1-2 series ligeras del primer ejercicio. Deja 1-2 repeticiones en reserva en cada serie.</p>
-      <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+routinePlan();
+      <p class="small muted" style="margin:0">${esc(R.focus)}. Deja 1-2 repeticiones en reserva en cada serie.</p>
+      <div class="row wrap"><span class="chip on">⏱ ~${liftMin(R)} min</span><span class="chip">Bloque ${bi.block} · semana ${bi.week} de 6</span>${isDeload()?'<span class="chip warnchip">Semana de descarga</span>':''}</div></section>`+warmCard(type)+routinePlan();
     {const s=state.settings;const tg=(k,l)=>`<div class="spread small" style="padding:6px 0;border-top:1px solid var(--line)"><span>${l}</span><button class="toggle ${(k==='tWarn'?s[k]===true:s[k]!==false)?'on':''}" data-a="tset" data-v="${k}" aria-pressed="${k==='tWarn'?s[k]===true:s[k]!==false}" aria-label="${l}"></button></div>`;
     html+=`<section class="card"><details><summary>Avisos del descanso</summary><div style="margin-top:8px">
       ${tg('tSound','Pitidos al acabar el descanso')}${tg('tWarn','Aviso 10 segundos antes')}${tg('tVoice','Voz que dice la siguiente serie y el peso (en iPhone pausa la música)')}${tg('tVib','Vibración (solo Android)')}${tg('tAwake','Pantalla siempre encendida en el gym')}
