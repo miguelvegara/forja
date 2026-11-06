@@ -961,7 +961,7 @@ function stepTarget(k=ui.cur){return Math.round(state.settings.steps||10000)}
 function stepsWeek(k=ui.cur){const m=monday(k),v=[];for(let i=0;i<7;i++){const dk2=add(m,i);if(dk2>TODAY)break;const d=peek(dk2);if(d&&d.steps>0)v.push(d.steps)}return{n:v.length,avg:v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null}}
 function stepsCard(){const t=stepTarget(),w=stepsWeek();return `<section class="card stack"><div class="spread"><h2>Pasos</h2><span class="chip num">${th(t*7)} a la semana</span></div>
   <div class="kpis"><div class="kpi"><b class="num">${th(t)}</b><span>media ideal al día</span></div><div class="kpi"><b class="num" style="color:${w.avg==null?'inherit':w.avg>=t?'var(--ok)':'var(--warn)'}">${w.avg!=null?th(w.avg):'—'}</b><span>tu media esta semana${w.n?' ('+w.n+' d)':''}</span></div></div>
-  <p class="muted small" style="margin:0">Como tú quieras: lo que cuenta es la media de la semana. Apunta los pasos de cada día en Hoy.</p></section>`}
+  <p class="muted small" style="margin:0">Como tú quieras: lo que cuenta es la media de la semana. Bici moderada: 1 min = 150 pasos. Cinta con 6-8 % de pendiente: 30 min ≈ 6.000. Apunta el total en Hoy.</p></section>`}
 
 /* ================= MENÚ ================= */
 /* Cada día cubre fibra, calcio, zinc y omega-3: si el menú se queda corto, la app añade fruta, verdura o un yogur y recalcula las cantidades. */
@@ -1727,14 +1727,41 @@ const LIFE=[
   ['sus1','Sin tabaco ni vapeo: envejecen la piel y bajan el rendimiento.'],
   ['sus2','Alcohol: como mucho 2 cañas y no todos los fines de semana. Quita sueño, músculo y energía.']]}
 ];
+const FAST=[
+ {h:'1. Pasos y cardio',items:[
+  ['pa1','10.000 pasos de media al día, en todas las fases. Si en definición te estancas 3 semanas, súbelos a 12.000 antes de comer menos.'],
+  ['pa2','Bici moderada (puedes hablar pero notas el esfuerzo): 1 min = 150 pasos. 10 min ≈ 1.500, 30 min ≈ 4.500, 1 h ≈ 9.000. Suave: 100 por minuto; fuerte: 200. Súmalos tú a los pasos del día.'],
+  ['pa3','Cinta: 6-8 % de pendiente a 5-5,5 km/h, sin agarrarte. 30 min ≈ 6.000 pasos (en llano solo ≈ 3.500).'],
+  ['pa4','Pasos sin perder tiempo: llamadas andando, aparcar lejos, escaleras y 10-15 min andando después de comer y de cenar (≈ 3.000-4.000 pasos, y digieres mejor).']]},
+ {h:'2. Gym',items:[
+  ['gy1','Ve en horas valle (antes de las 18:00 o después de las 21:00): máquinas libres y sin esperas.'],
+  ['gy2','Bolsa preparada la noche antes: ropa, auriculares, toalla, agua y la creatina.'],
+  ['gy3','Si la máquina está ocupada: haz otro ejercicio grande del día o usa «Cambiar». Los pequeños siempre al final.'],
+  ['gy4','Cambiar el orden o un ejercicio de vez en cuando no pasa nada. Lo que te hace crecer es hacer todas las series y subir peso semana a semana.'],
+  ['gy5','Chin tucks durante el descanso del último ejercicio. Móvil solo para la app y la música.']]},
+ {h:'3. Comida',items:[
+  ['co1','Compra online en Mercadona con entrega a casa: repites la lista de la app y te ahorras 1 hora cada compra.'],
+  ['co2','Pollo de la semana al horno de una vez: bandejas enteras con sal y especias, 200 °C 25-30 min. Lo partes en tuppers para 4 días.'],
+  ['co3','Arroz en vasitos de microondas (1 min) si no quieres cocerlo. Patata de microondas en su bolsa (8 min).'],
+  ['co4','Huevos: cuece 12 de golpe (10 min), pélalos y a la nevera. Te duran 5 días.'],
+  ['co5','Creatina en el vaso de leche del desayuno: así no se olvida.']]},
+ {h:'4. Sueño',items:[
+  ['su1','Alarma también para acostarte. Hora fija todos los días.'],
+  ['su2','Móvil cargando fuera de la habitación y un despertador barato: te dormirás antes.']]},
+ {h:'5. Imagen sin perder tiempo',items:[
+  ['im1','Limpiador facial en la ducha. Al salir, hidratante con protector en un solo producto (crema hidratante con SPF 50).'],
+  ['im2','Pelo en la ducha: espuma con el pelo húmedo y difusor 5 min mientras te vistes.'],
+  ['im3','Uniforme: 5-6 combinaciones fijas con tus básicos. Cero tiempo pensando qué ponerte.'],
+  ['im4','Báscula al lado del váter y cinta métrica en el cajón del baño: pesarte y medirte te cuesta 30 segundos.']]}
+];
 function vLook(){
-  const isL=ui.look==='life',G=isL?LIFE:LOOK,done=state.settings.look||{},all=G.flatMap(s=>s.items),n=all.filter(i=>done[i[0]]).length;
+  const isF=ui.look==='fast',isL=ui.look==='life',G=isF?FAST:isL?LIFE:LOOK,done=state.settings.look||{},all=G.flatMap(s=>s.items),n=all.filter(i=>done[i[0]]).length;
   return header()+`<div class="stack">
     <div class="row"><button class="btn sm" data-a="look-close">${sicon('left')} Plan</button></div>
-    <section class="stack"><h1>${isL?'Tu mejor versión':'Tu imagen'}</h1>
+    <section class="stack"><h1>${isF?'Atajos':isL?'Tu mejor versión':'Tu imagen'}</h1>
       <p class="small muted" style="margin:0">Ordenado por impacto: empieza por arriba. Marca lo que ya tienes hecho.</p>
       <div class="kpis"><div class="kpi"><b class="num">${n}/${all.length}</b><span>hecho</span></div></div>
-      <div class="callout small"><b>Si solo haces 3 cosas:</b> ${isL?'dormir a horas fijas, 90 min de foco sin móvil cada mañana y la revisión semanal del domingo.':'el físico (rutina y menú), el pelo suelto y ondulado, y piel limpia con protector solar.'}</div></section>
+      <div class="callout small"><b>Si solo haces 3 cosas:</b> ${isF?'compra online, pollo de la semana al horno de una vez e ir al gym en horas valle.':isL?'dormir a horas fijas, 90 min de foco sin móvil cada mañana y la revisión semanal del domingo.':'el físico (rutina y menú), el pelo suelto y ondulado, y piel limpia con protector solar.'}</div></section>
     ${G.map(s=>`<section class="card"><div class="eyebrow">${esc(s.h)}</div>${s.items.map(([k,t])=>`<div class="fitem" style="${done[k]?'opacity:.5':''}"><div class="nm" style="font-weight:400">${esc(t)}</div><div class="acts"><button class="done ${done[k]?'on':''}" data-a="look-tick" data-v="${k}" aria-label="Hecho">${ICON.check}</button></div></div>`).join('')}</section>`).join('')}
   </div>`;
 }
@@ -1746,6 +1773,8 @@ function vPlan(){
   return header()+`<div class="stack">
     <button class="card" data-a="look-open" style="text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font:inherit;color:inherit;cursor:pointer">
       <span><b style="font-family:var(--display);font-size:20px">Tu imagen</b><br><span class="small muted">Pelo, piel, barba, ropa, gafas, fotos y actitud</span></span>${sicon('right',20)}</button>
+    <button class="card" data-a="look-open" data-v="fast" style="text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font:inherit;color:inherit;cursor:pointer">
+      <span><b style="font-family:var(--display);font-size:20px">Atajos</b><br><span class="small muted">Pasos, bici y cinta, gym, comida y rutinas que te ahorran tiempo</span></span>${sicon('right',20)}</button>
     <button class="card" data-a="look-open" data-v="life" style="text-align:left;display:flex;justify-content:space-between;align-items:center;gap:12px;font:inherit;color:inherit;cursor:pointer">
       <span><b style="font-family:var(--display);font-size:20px">Tu mejor versión</b><br><span class="small muted">Sueño, foco, organización, salud, mente, social y dinero</span></span>${sicon('right',20)}</button>
     <section class="card stack"><h2>Tu semana</h2>
