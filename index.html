@@ -1045,6 +1045,8 @@ const fmtH=h=>Math.floor(h)+' h '+String(Math.round((h%1)*60)).padStart(2,'0');
 function moved(d,k){const t=dayType(k);if(t==='rest')return true;if(!d)return false;if(ROUTINE[t])return Object.values(d.sets||{}).flat().some(s=>s&&s.done);if(t==='walk')return!!d.walk||(d.steps>=stepTarget(k));return false}
 /* Lo esencial: lo que más pesa para gustar (cuerpo, cara, pelo y trato). Nada más. */
 const HAB=[
+ {k:'peso',n:'Pesarte en ayunas, tras el baño',auto:d=>!!(d&&d.weight)},
+ {k:'medir',n:'Lunes: medir cintura y cuello',auto:(d,k)=>{if(pk(k).getDay()!==1){const lm=lastMeasure();return !!lm&&lm.k>add(k,-8)}return !!(d&&d.waist&&d.neck)}},
  {k:'move',n:'Entreno del día hecho',auto:(d,k)=>{const t=dayType(k);if(!ROUTINE[t])return true;return !!d&&Object.values(d.sets||{}).flat().some(s=>s&&s.done)}},
  {k:'steps',n:'Pasos',auto:(d,k)=>!!(d&&d.steps>=stepTarget(k))},
  {k:'menu',n:'Desayuno y cena del menú'},
@@ -1107,14 +1109,14 @@ function ival(v){return v!=null?String(v).replace('.',','):''}
 function weeklyCard(){
   const lm=lastMeasure(),rec=phaseRec(),s=state.settings,sug=adjustSuggestion();
   const d=peek(ui.cur)||{};
-  const due=!lm||lm.k<=add(TODAY,-7)||lm.k===ui.cur||!!(d.waist||d.neck);
+  const due=pk(ui.cur).getDay()===1||!lm||lm.k<=add(TODAY,-8)||lm.k===ui.cur||!!(d.waist||d.neck);
   const wk=monday(TODAY);
   const adj=sug&&sug.delta&&s.adjWeek!==wk;
   let body=`<div class="phase"><span class="eyebrow">Tu fase</span><b>${PHASES[s.mode].n}</b><span class="small muted">${esc(s.autoPhase?rec.why:'Fase elegida a mano. Activa la fase automática en Plan para que la app decida.')}</span></div>`;
   if(adj)body+=`<div class="callout warn">Tu peso ${sug.rate>sug.goal?'sube más':'baja más'} de lo que toca (${sug.rate>=0?'+':''}${nf(sug.rate,2)} kg/sem). Cambia la dieta: ${sug.delta>0?'sube':'baja'} ${nf(Math.abs(sug.delta))} kcal al día.
     <div style="margin-top:8px"><button class="btn primary sm" data-a="apply-adj" data-v="${sug.delta}">Aplicar ${sug.delta>0?'+':''}${sug.delta} kcal</button></div></div>`;
   else if(sug&&!sug.delta)body+=`<div class="callout ok small">Tu peso va al ritmo correcto. No cambies la dieta esta semana.</div>`;
-  if(due)body+=`<div class="stack" style="gap:8px"><div class="small"><b>Toca medirte</b> <span class="muted">(una vez por semana, en ayunas)</span></div>
+  if(due)body+=`<div class="stack" style="gap:8px"><div class="small"><b>Toca medirte</b> <span class="muted">(cada lunes, en ayunas)</span></div>
     <div class="${isF()?'grid3':'grid2'}">
       <div class="field"><label for="wa">Cintura</label><input class="inp" id="wa" inputmode="decimal" data-f="waist" value="${ival(d.waist)}" placeholder="cm"></div>
       <div class="field"><label for="ne">Cuello</label><input class="inp" id="ne" inputmode="decimal" data-f="neck" value="${ival(d.neck)}" placeholder="cm"></div>
