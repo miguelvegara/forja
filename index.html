@@ -1119,15 +1119,15 @@ function weeklyCard(){
   if(adj)body+=`<div class="callout warn">Tu peso ${sug.rate>sug.goal?'sube más':'baja más'} de lo que toca (${sug.rate>=0?'+':''}${nf(sug.rate,2)} kg/sem). Cambia la dieta: ${sug.delta>0?'sube':'baja'} ${nf(Math.abs(sug.delta))} kcal al día.
     <div style="margin-top:8px"><button class="btn primary sm" data-a="apply-adj" data-v="${sug.delta}">Aplicar ${sug.delta>0?'+':''}${sug.delta} kcal</button></div></div>`;
   else if(sug&&!sug.delta)body+=`<div class="callout ok small">Tu peso va al ritmo correcto. No cambies la dieta esta semana.</div>`;
-  if(due)body+=`<div class="stack" style="gap:8px"><div class="small"><b>Toca medirte</b> <span class="muted">(cada lunes, en ayunas)</span></div>
+  return `<section class="card stack">${body}</section>`;
+}
+
+function measureBlock(d){const lm=lastMeasure(),due=pk(ui.cur).getDay()===1||!lm||lm.k<=add(TODAY,-8)||lm.k===ui.cur||!!(d.waist||d.neck);if(!due)return '';return `<div class="stack" style="gap:8px"><div class="small"><b>Toca medirte:</b> <span class="muted">(cada lunes, en ayunas)</span></div>
     <div class="${isF()?'grid3':'grid2'}">
       <div class="field"><label for="wa">Cintura</label><input class="inp" id="wa" inputmode="decimal" data-f="waist" value="${ival(d.waist)}" placeholder="cm"></div>
       <div class="field"><label for="ne">Cuello</label><input class="inp" id="ne" inputmode="decimal" data-f="neck" value="${ival(d.neck)}" placeholder="cm"></div>
       ${isF()?`<div class="field"><label for="hp">Cadera</label><input class="inp" id="hp" inputmode="decimal" data-f="hip" value="${ival(d.hip)}" placeholder="cm"></div>`:''}
-    </div><p class="small muted" style="margin:0">Solo esto para tu % de grasa. Cintura a la altura del ombligo sin meter tripa. Cuello justo bajo la nuez.${isF()?' Cadera: por la parte más ancha del glúteo.':''}</p></div>`;
-  return `<section class="card stack">${body}</section>`;
-}
-
+    </div><p class="small muted" style="margin:0">Solo esto para tu % de grasa. Cintura a la altura del ombligo sin meter tripa. Cuello justo bajo la nuez.${isF()?' Cadera: por la parte más ancha del glúteo.':''}</p></div>`}
 function vHoy(){
   const d=peek(ui.cur)||{},type=dayType(),tg=targets(),R=ROUTINE[type];
   let session='';
@@ -1145,6 +1145,17 @@ function vHoy(){
   const sc=habScore(ui.cur);
   return header()+`<div class="stack">
     ${heroCard()}
+    <section class="card stack">
+      <div class="spread"><h2>Apunta lo de hoy</h2>${pk(ui.cur).getDay()===1?'<span class="chip warnchip">Lunes: medidas</span>':''}</div>${measureBlock(d)}
+      <div class="grid2">
+        <div class="field"><label for="w-in">Peso en ayunas (kg)</label><input class="inp" id="w-in" inputmode="decimal" data-f="weight" value="${ival(d.weight)}" placeholder="${prevW?ival(prevW[1]):'94'}"></div>
+        <div class="field"><label for="st-in">Pasos de hoy</label><input class="inp" id="st-in" inputmode="numeric" data-f="steps" value="${d.steps!=null?d.steps:''}" placeholder="meta ${th(stepTarget())}"></div>
+        <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
+        <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
+      </div>
+      ${d.steps!=null&&effSteps(d)<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-effSteps(d))}</b> pasos: <b>${Math.ceil((stepTarget()-effSteps(d))/cintaPPM())} min de cinta</b> al ${String(cintaCfg().inc).replace('.',',')} % y ${String(cintaCfg().vel).replace('.',',')} km/h sin agarrarte, o <b>${Math.ceil((stepTarget()-effSteps(d))/150/5)*5} min de bici</b> a ritmo moderado. Hazlos al acabar el entreno.</div>`:''}
+      <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
+    </section>
     ${scheduleCard()}
     ${weeklyCard()}
     <section class="card stack">
@@ -1159,17 +1170,6 @@ function vHoy(){
     ${checksDue().length?`<section class="card stack"><h3>Pendiente</h3>${checksDue().map(([k,n,,d])=>`<div class="spread" style="padding:6px 0;border-top:1px solid var(--line)"><span style="min-width:0">${esc(n)}<br><span class="small muted">${esc(d)}</span></span><button class="btn sm" data-a="check" data-v="${k}">Hecho</button></div>`).join('')}</section>`:''}
     ${backupDue()?`<section class="card stack"><div class="spread"><h3>Copia del mes</h3><button class="btn primary sm" data-a="backup">Descargar</button></div><p class="small muted" style="margin:0">Guárdala en iCloud o en Google Drive. Así no pierdes tus datos pase lo que pase.</p></section>`:''}
     ${sleepCard()}
-    <section class="card stack">
-      <h3>Check-in</h3>
-      <div class="grid2">
-        <div class="field"><label for="w-in">Peso en ayunas (kg)</label><input class="inp" id="w-in" inputmode="decimal" data-f="weight" value="${ival(d.weight)}" placeholder="${prevW?ival(prevW[1]):'94'}"></div>
-        <div class="field"><label for="st-in">Pasos de hoy</label><input class="inp" id="st-in" inputmode="numeric" data-f="steps" value="${d.steps!=null?d.steps:''}" placeholder="meta ${th(stepTarget())}"></div>
-        <div class="field"><label for="bed">Anoche, a la cama</label><input class="inp" type="time" id="bed" data-t="bed" value="${esc(d.bed||'')}"></div>
-        <div class="field"><label for="wake">Me levanté</label><input class="inp" type="time" id="wake" data-t="wake" value="${esc(d.wake||'')}"></div>
-      </div>
-      ${d.steps!=null&&effSteps(d)<stepTarget()?`<div class="callout small">Te faltan <b class="num">${th(stepTarget()-effSteps(d))}</b> pasos: <b>${Math.ceil((stepTarget()-effSteps(d))/cintaPPM())} min de cinta</b> al ${String(cintaCfg().inc).replace('.',',')} % y ${String(cintaCfg().vel).replace('.',',')} km/h sin agarrarte, o <b>${Math.ceil((stepTarget()-effSteps(d))/150/5)*5} min de bici</b> a ritmo moderado. Hazlos al acabar el entreno.</div>`:''}
-      <p class="small muted" style="margin:0">${sleepH(d)!=null?`Has dormido <b class="num" style="color:${sleepH(d)>=7.5?'var(--ok)':'var(--warn)'}">${fmtH(sleepH(d))}</b>. `:''}Pésate cada mañana tras el baño. La app usa la media de 7 días. ${STANDALONE?'Pasos: usa tu atajo «Pasos a Forja» (Plan → Pasos desde Salud) o cópialos de la app Salud.':'Los pasos los ves en la app Salud.'}</p>
-    </section>
     <section class="card stack">
       <div class="spread"><h3>Lo esencial</h3><span class="chip num ${sc>=HAB.length?'on':''}">${sc}/${HAB.length}</span></div>
       <div>${HAB.map((h,hi)=>{const on=habOn(h,d,ui.cur);return `${h.g&&(hi===0||HAB[hi-1].g!==h.g)?`<div class="eyebrow" style="margin-top:${hi?12:0}px;padding-bottom:4px">${esc(h.g)}</div>`:''}<div class="spread" style="padding:7px 0;border-top:1px solid var(--line)">
