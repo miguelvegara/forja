@@ -1463,6 +1463,8 @@ const noFrz=()=>state.settings.noFrz===true;
 const DOWL=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 function shopItem(f){const s=SHOP[f];if(!s)return s;
   if(noFrz()&&f==='pan')return{...s,n:'Pan de molde 100 % integral',d:'Pasillo del pan de molde. Que ponga «100 % integral». Cerrado aguanta unos 10 días fuera de la nevera: coge el de fecha más lejana y mira el peso del paquete.',pack:450,pu:'paquete ~450 g',frz:0};
+  /* Con la cena fija los huevos solo van en el desayuno: ya cocidos y pelados, cero trabajo */
+  if(f==='huevo'&&state.settings.sameDinner===true)return{...s,n:'Huevos cocidos pelados Hacendado',d:'Nevera de los huevos. Bandeja de 6 huevos ya cocidos y pelados. Coge los de fecha más lejana; una vez abierta, gasta la bandeja en 3 días (justo 2 al día).',pack:6,pu:'pack de 6'};
   return s}
 function shopList(days,from=0){
   const need={};
