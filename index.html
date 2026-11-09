@@ -455,9 +455,7 @@ const FREE={comida:{id:'libreC',n:'Comida libre',how:'Lo que haya, en casa o fue
 function menuTpl(k){const m={},names={},fm=state.settings.freeMid===true;mealPlan().forEach(ml=>{const o=fm&&FREE[ml]?FREE[ml]:optFor(k,ml);m[ml]=o.i;names[ml]=o});
   const simp=state.settings.simple!==false&&k>=SIMPLE_FROM;
   if(state.settings.mode==='cut'&&m.cena&&!simp)m.cena=[...m.cena,['batido',.75,'x']];
-  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['brocoli',1,'x']];
-  /* Sin congelador: la ensalada en bolsa no llega al fin de semana; de viernes a domingo, brócoli congelado */
-  if(simp&&m.cena&&state.settings.noFrz===true&&blockOf(k).len===3)m.cena=m.cena.map(([f,q,r])=>f==='ensalada'?['espinacas',q,r]:[f,q,r]); /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
+  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x']]; /* verdura: solo la ensalada de bolsa, lo más sencillo */ /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
   if(state.settings.mode==='cut'&&m.comida&&!fm)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
@@ -524,7 +522,7 @@ const SHOP={
  citrico:{s:3,n:'Naranjas',d:'Fruta. Malla o sueltas, las de mesa (no las de zumo).',per:1,pack:1,pu:'pieza',u:'ud'},
  fruta:{s:3,n:'Manzanas',d:'Fruta. Las que más te gusten, sueltas o en bolsa.',per:1,pack:1,pu:'pieza',u:'ud'},
  verdura:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
- ensalada:{s:3,n:'Ensalada 4 estaciones + tomates',d:'Fruta y verdura, nevera de bolsas. Bolsa «Ensalada 4 estaciones» y 2 tomates por bolsa. Coge las de fecha más lejana.',per:100,pack:250,pu:'bolsa + 2 tomates'},
+ ensalada:{s:3,n:'Ensalada 4 estaciones + tomates',d:'Fruta y verdura, nevera de bolsas. Bolsa «Ensalada 4 estaciones» y 2 tomates por bolsa. Coge las de fecha más lejana.',per:100,pack:250,pu:'bolsa + 2 tomates',fresh:1},
  brocoli:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
  judias:{s:3,n:'Judías verdes congeladas',d:'Arcón de congelados, zona de verduras. Bolsa de judías verdes troceadas.',per:100,pack:1000,pu:'bolsa ~1 kg'},
  salteado:{s:3,n:'Salteado de verduras congelado',d:'Arcón de congelados, zona de verduras. Bolsa de verduras salteadas SIN arroz ni pasta.',per:100,pack:600,pu:'bolsa ~600 g'},
@@ -1488,7 +1486,7 @@ function amtText(x){const s=x.s;if(s.u==='ud')return nf(Math.ceil(x.amt))+' ud';
 function vShop(){
   const nz=noFrz(),days=nz?7:(state.settings.shopDays||7),done=state.settings.shopDone||{};
   let list=shopList(days),list2=[];
-  if(nz){list=list.filter(x=>!x.s.fr).concat(shopList(4).filter(x=>x.s.fr));list2=shopList(days,4).filter(x=>x.s.fr).map(x=>({...x,f2:x.f+'@2'}))}
+  if(nz){const fr=x=>x.s.fr||x.s.fresh;list=list.filter(x=>!fr(x)).concat(shopList(4).filter(fr));list2=shopList(days,4).filter(fr).map(x=>({...x,f2:x.f+'@2'}))}
   const left=list.concat(list2).filter(x=>!done[x.f2||x.f]).length;
   const item=x=>{const k=x.f2||x.f;return `<div class="fitem" style="${done[k]?'opacity:.45':''}">
       <div class="nm" style="${done[k]?'text-decoration:line-through':''}">${esc(x.s.n)}${(x.s.fr||x.s.frz)&&days>4&&!nz?' <span class="unit">congelar</span>':''}</div>
@@ -1497,7 +1495,7 @@ function vShop(){
       ${x.s.d?`<div class="small muted" style="grid-column:1/-1">${esc(x.s.d)}</div>`:''}
     </div>`};
   const sec2=list2.length?`<section class="card"><div class="eyebrow">Segunda compra · el ${DOWL[pk(add(TODAY,3)).getDay()]}</div>
-    <p class="small muted" style="margin:0 0 4px">La carne fresca aguanta 3-4 días en la nevera. Esto es para los últimos días de la semana: cómpralo el ${DOWL[pk(add(TODAY,3)).getDay()]} y cocínalo ese mismo día.</p>${list2.map(item).join('')}</section>`:'';
+    <p class="small muted" style="margin:0 0 4px">La carne fresca y la ensalada en bolsa aguantan 3-4 días. Esto es para los últimos días de la semana: cómpralo el ${DOWL[pk(add(TODAY,3)).getDay()]} y la carne cocínala ese mismo día.</p>${list2.map(item).join('')}</section>`:'';
   const secs=SHOP_SECS.map((sec,i)=>{
     const its=list.filter(x=>x.s.s===i);if(!its.length)return'';
     return `<section class="card"><div class="eyebrow">${sec}</div>${its.map(item).join('')}</section>`;
