@@ -505,7 +505,7 @@ const SHOP={
  salmon:{s:0,n:'Lomos de salmón',d:'Nevera de pescado envasado. Bandeja de 2 lomos de salmón sin piel.',per:150,pack:250,pu:'bandeja ~250 g',fr:1,cook:1},
  merluza:{s:0,n:'Filetes de merluza congelados',d:'Arcón de congelados, zona de pescado. Bolsa de «Filetes de merluza sin piel» Hacendado (al natural, NO rebozada).',per:180,pack:600,pu:'bolsa ~600 g',cook:1},
  huevo:{s:1,n:'Huevos L',d:'Pasillo de los huevos. Cartón de 12 huevos talla L.',per:1,pack:12,pu:'docena',u:'ud'},
- claras:{s:1,n:'Claras de huevo pasteurizadas Hacendado',d:'Nevera junto a los huevos. Botella de 1 L de claras líquidas. Una vez abierta, gástala en pocos días.',per:200,pack:1000,pu:'botella 1 L',ml:1},
+ claras:{s:1,n:'Claras de huevo pasteurizadas Hacendado',d:'Nevera junto a los huevos. Botella de 1 L de claras líquidas. Una vez abierta, gástala en pocos días.',per:200,pack:1000,pu:'botella 1 L',ml:1,po:1},
  leche:{s:1,n:'Leche semidesnatada sin lactosa Hacendado',d:'Pasillo de la leche (no está en nevera). Brick de 1 L. Se vende suelto o en pack de 6.',per:250,pack:1000,pu:'brick 1 L',ml:1},
  batido:{s:1,n:'Queso fresco batido 0% Hacendado',d:'Nevera de yogures. Tarrina blanca grande de 500 g; por dentro es como un yogur muy espeso.',per:250,pack:500,pu:'tarrina 500 g'},
  skyr:{s:1,n:'Yogur +Proteínas natural Hacendado',d:'Nevera de yogures. Yogur natural con «+Proteínas» en el envase, sin sabores.',per:1,pack:1,pu:'yogur',u:'ud'},
@@ -1282,7 +1282,7 @@ function vComida(){
       <ol class="small" style="margin:0;padding-left:20px;display:grid;gap:6px">
         <li><b>Comes lo que pone el menú,</b> a la hora del horario. Nada más.</li>
         <li><b>¿Hambre fuera de hora?</b> Un plátano. Siempre lo mismo.</li>
-        <li><b>¿No tienes el tupper hecho?</b> Plan B: 1 lata de atún, 2 trozos de pan integral (del congelador) y ensalada. Siempre hay en casa.</li>
+        <li><b>¿No tienes el tupper hecho?</b> Plan B: 1 lata de atún, 2 trozos de pan integral y ensalada. Siempre hay en casa.</li>
         <li><b>¿Comes fuera?</b> Carne o pescado a la plancha con patata o arroz y ensalada. Sin pan extra ni postre. Agua o refresco zero.</li>
         <li><b>Una comida libre a la semana,</b> la que tú quieras, sin culpa. Al día siguiente, menú normal.</li>
         <li><b>¿Te has saltado algo?</b> No compenses. La siguiente comida, la del menú.</li>
@@ -1452,12 +1452,21 @@ function prepCard(){
   </details></section>`;
 }
 
-function shopList(days){
+/* Sin congelador: pan de molde (aguanta ~10 días fuera de la nevera) y la carne fresca se compra en dos veces */
+const noFrz=()=>state.settings.noFrz===true;
+const DOWL=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+function shopItem(f){const s=SHOP[f];if(!s)return s;
+  if(noFrz()&&f==='pan')return{...s,n:'Pan de molde 100 % integral',d:'Pasillo del pan de molde. Que ponga «100 % integral». Cerrado aguanta unos 10 días fuera de la nevera: coge el de fecha más lejana y mira el peso del paquete.',pack:450,pu:'paquete ~450 g',frz:0};
+  return s}
+function shopList(days,from=0){
   const need={};
-  for(let i=0;i<days;i++)buildMenu(menuTpl(add(TODAY,i))).forEach(it=>{need[it.f]=(need[it.f]||0)+it.q});
-  return Object.entries(need).filter(([f])=>SHOP[f]).map(([f,q])=>{const s=SHOP[f],amt=q*s.per;
-    const packs=Math.max(1,Math.ceil(amt/s.pack-.03));const left=packs*s.pack-amt;
-    return{f,s,amt,packs,left:left>s.pack*.25?left:0}});
+  for(let i=from;i<days;i++)buildMenu(menuTpl(add(TODAY,i))).forEach(it=>{need[it.f]=(need[it.f]||0)+it.q});
+  return Object.entries(need).filter(([f])=>SHOP[f]).map(([f,q])=>{const s=shopItem(f),amt=q*s.per;
+    let packs=Math.max(1,Math.ceil(amt/s.pack-.03));let short=0;
+    /* Lo que caduca al abrirlo (claras): mejor quedarse un poco corto que tirar media botella */
+    if(s.po&&packs>1&&(packs-1)*s.pack>=amt*.8){packs--;short=amt-packs*s.pack}
+    const left=packs*s.pack-amt;
+    return{f,s,amt,packs,short,left:left>s.pack*.25?left:0}});
 }
 /* Raciones para congelar: lo que necesita cada tanda de cocina (domingo y jueves) */
 function freezePlan(days){
@@ -1469,26 +1478,42 @@ function freezePlan(days){
 }
 function amtText(x){const s=x.s;if(s.u==='ud')return nf(Math.ceil(x.amt))+' ud';if(x.amt>=1000)return nf(x.amt/1000,1)+(s.ml?' L':' kg');return nf(Math.round(x.amt/10)*10)+(s.ml?' ml':' g')}
 function vShop(){
-  const days=state.settings.shopDays||7,done=state.settings.shopDone||{};
-  const list=shopList(days),left=list.filter(x=>!done[x.f]).length;
+  const nz=noFrz(),days=nz?7:(state.settings.shopDays||7),done=state.settings.shopDone||{};
+  let list=shopList(days),list2=[];
+  if(nz){list=list.filter(x=>!x.s.fr).concat(shopList(4).filter(x=>x.s.fr));list2=shopList(days,4).filter(x=>x.s.fr).map(x=>({...x,f2:x.f+'@2'}))}
+  const left=list.concat(list2).filter(x=>!done[x.f2||x.f]).length;
+  const item=x=>{const k=x.f2||x.f;return `<div class="fitem" style="${done[k]?'opacity:.45':''}">
+      <div class="nm" style="${done[k]?'text-decoration:line-through':''}">${esc(x.s.n)}${(x.s.fr||x.s.frz)&&days>4&&!nz?' <span class="unit">congelar</span>':''}</div>
+      <div class="acts"><button class="done ${done[k]?'on':''}" data-a="shop-tick" data-v="${k}" aria-label="Marcar ${esc(x.s.n)}">${ICON.check}</button></div>
+      <div class="q">${x.s.fr&&!x.s.u?`<b class="num" style="color:var(--ink)">~${nf(Math.ceil(x.amt/50)*50)} g</b> · bandejas que sumen ese peso`:`<b class="num" style="color:var(--ink)">${x.s.u==='ud'&&x.s.pack===1?nf(x.packs)+' '+esc(x.packs>1?(x.s.pu==='unidad'?'unidades':x.s.pu==='yogur'?'yogures':x.s.pu+'s'):x.s.pu):nf(x.packs)+' × '+esc(x.s.pu)}</b> · necesitas ${amtText(x)}${x.left?` · <span style="color:var(--warn)">sobran ~${amtText({s:x.s,amt:x.left})}</span>`:''}`}${x.short?` · <span style="color:var(--warn)">te faltan ~${amtText({s:x.s,amt:x.short})}: el último día, 3 huevos en vez de claras</span>`:''}</div>
+      ${x.s.d?`<div class="small muted" style="grid-column:1/-1">${esc(x.s.d)}</div>`:''}
+    </div>`};
+  const sec2=list2.length?`<section class="card"><div class="eyebrow">Segunda compra · el ${DOWL[pk(add(TODAY,3)).getDay()]}</div>
+    <p class="small muted" style="margin:0 0 4px">La carne fresca aguanta 3-4 días en la nevera. Esto es para los últimos días de la semana: cómpralo el ${DOWL[pk(add(TODAY,3)).getDay()]} y cocínalo ese mismo día.</p>${list2.map(item).join('')}</section>`:'';
   const secs=SHOP_SECS.map((sec,i)=>{
     const its=list.filter(x=>x.s.s===i);if(!its.length)return'';
-    return `<section class="card"><div class="eyebrow">${sec}</div>${its.map(x=>`<div class="fitem" style="${done[x.f]?'opacity:.45':''}">
-      <div class="nm" style="${done[x.f]?'text-decoration:line-through':''}">${esc(x.s.n)}${(x.s.fr||x.s.frz)&&days>4?' <span class="unit">congelar</span>':''}</div>
-      <div class="acts"><button class="done ${done[x.f]?'on':''}" data-a="shop-tick" data-v="${x.f}" aria-label="Marcar ${esc(x.s.n)}">${ICON.check}</button></div>
-      <div class="q"><b class="num" style="color:var(--ink)">${x.s.u==='ud'&&x.s.pack===1?nf(x.packs)+' '+esc(x.packs>1?(x.s.pu==='unidad'?'unidades':x.s.pu==='yogur'?'yogures':x.s.pu+'s'):x.s.pu):nf(x.packs)+' × '+esc(x.s.pu)}</b> · necesitas ${amtText(x)}${x.left?` · <span style="color:var(--warn)">sobran ~${amtText({s:x.s,amt:x.left})}</span>`:''}</div>
-      ${x.s.d?`<div class="small muted" style="grid-column:1/-1">${esc(x.s.d)}</div>`:''}
-    </div>`).join('')}</section>`;
-  }).join('');
+    return `<section class="card"><div class="eyebrow">${sec}</div>${its.map(item).join('')}</section>`;
+  }).join('')+sec2;
   return header()+`<div class="stack">
     <div class="row"><button class="btn sm" data-a="shop-close">${sicon('left')} Comida</button></div>
     <section class="stack"><h1>Lista de la compra</h1>
       <p class="small muted" style="margin:0">Exactamente lo que comes en tus menús de los próximos ${days} días (con tus cambios y platos quitados). Cantidades en crudo; los envases son los habituales de Mercadona, comprueba el peso en la etiqueta.${days>=14?' Comprando para 2 semanas o más, los menús usan solo cosas que aguantan: verdura congelada y fruta de nevera.':''} Haz tus cambios de platos antes de comprar.</p>
-      <div class="seg">${[[7,'1 semana'],[14,'2 semanas'],[30,'1 mes']].map(([n,l])=>`<button data-a="shop-days" data-v="${n}" class="${days===n?'on':''}">${l}</button>`).join('')}</div>
+      ${nz?'':`<div class="seg">${[[7,'1 semana'],[14,'2 semanas'],[30,'1 mes']].map(([n,l])=>`<button data-a="shop-days" data-v="${n}" class="${days===n?'on':''}">${l}</button>`).join('')}</div>`}
+      <div class="spread small"><span>Sin congelar nada${nz?': compra semanal':''}</span><button class="toggle ${nz?'on':''}" data-a="nofrz" aria-pressed="${nz}" aria-label="Sin congelar nada"></button></div>
       <div class="spread small"><span class="muted">${left?left+' por coger':'Todo en el carro'}</span><button class="btn ghost sm" data-a="shop-reset">Desmarcar todo</button></div>
     </section>
     ${secs}
-    ${days>4?`<section class="card stack"><h3>Al llegar a casa</h3>
+    ${nz?`<section class="card stack"><h3>Para que no se caduque nada</h3>
+      <div class="small" style="display:grid;gap:6px">
+        <div>• <b>Carne:</b> cocínala el mismo día que la compras. Cocinada aguanta 3-4 días en la nevera, en tuppers cerrados.</div>
+        <div>• <b>Pan de molde:</b> fuera de la nevera y bien cerrado.</div>
+        <div>• <b>Ensalada en bolsa:</b> coge las de fecha más lejana. Abre una cada vez y ciérrala con una pinza: abierta dura 1-2 días.</div>
+        <div>• <b>Claras:</b> mira en la etiqueta cuántos días duran una vez abiertas. Si no te llegan, el último día haz la tortilla con 3 huevos.</div>
+        <div>• <b>Leche:</b> abierta, 4 días en la nevera: un brick de 1 L son justo 4 desayunos.</div>
+        <div>• <b>Plátanos:</b> la mitad amarillos y la mitad con la punta verde. Si maduran antes de tiempo, a la nevera: la piel se pone negra, pero por dentro están bien.</div>
+        <div>• <b>Verduras congeladas:</b> ya vienen congeladas, solo tienes que meterlas en el congelador.</div>
+        <div>• <b>Regla:</b> lo que antes caduca, delante en la nevera, y se come primero.</div>
+      </div></section>`:days>4?`<section class="card stack"><h3>Al llegar a casa</h3>
       <div class="small" style="display:grid;gap:6px">${freezePlan(days).map(x=>x.f==='pan'?`<div>• <b>Pan:</b> córtalo en trozos de un palmo y congélalo en bolsas de ${Math.max(1,Math.round(x.avg/60))} trozo${Math.round(x.avg/60)>1?'s':''} (una por día). Tuéstalo directamente congelado.</div>`
         :`<div>• <b>${esc(SHOP[x.f].n)}:</b> ${x.n>1?`repártelo en <b>${x.n} bolsas de ~${nf(Math.round(x.avg/50)*50)} g</b> y congélalas (una por tanda de cocina).`:`congélalo en <b>1 bolsa de ~${nf(Math.round(x.avg/50)*50)} g</b> para su tanda de cocina.`}</div>`).join('')}
         <div>• <b>Verduras congeladas:</b> ya vienen congeladas: directas al congelador.</div>
@@ -1496,7 +1521,7 @@ function vShop(){
         ${days>=14?`<div>• <b>Lácteos</b> (queso batido, yogur): coge los de fecha más lejana; suelen aguantar 3-5 semanas. <b>Huevos:</b> unas 4 semanas en la nevera.</div>
         <div>• <b>Fruta:</b> ${['platano','mix'].includes(state.settings.fruitPref)?'las naranjas aguantan 3-4 semanas en la nevera. Los plátanos: compra la mitad de los plátanos verdes y la mitad amarillos: así te duran las 2 semanas. Fuera de la nevera.':'manzanas, naranjas y peras aguantan 3-4 semanas en el cajón de la nevera.'}</div>`:''}
       </div></section>`:''}
-    <div class="callout small"><b>Plan B siempre en casa:</b> 2 latas de atún al natural y 1 barra de pan integral cortada en el congelador. Repón cuando las gastes.</div>
+    <div class="callout small"><b>Plan B siempre en casa:</b> 2 latas de atún al natural y ${nz?'1 paquete de pan de molde integral':'1 barra de pan integral cortada en el congelador'}. Repón cuando las gastes.</div>
     <div class="callout small">No compres nada fuera de esta lista: es justo lo que vas a comer. Lo que pone «sobran» es porque el envase es más grande de lo que necesitas; úsalo el mes siguiente. Además: sal, especias y café a tu gusto.</div>
   </div>`;
 }
@@ -2318,6 +2343,7 @@ document.addEventListener('click',e=>{
     case'shop-open':ui.shop=true;render();window.scrollTo(0,0);break;
     case'shop-close':ui.shop=false;render();window.scrollTo(0,0);break;
     case'shop-days':state.settings.shopDays=+v;saveSettings();render();break;
+    case'nofrz':state.settings.noFrz=!noFrz();saveSettings();render();break;
     case'shop-tick':{const dn={...(state.settings.shopDone||{})};if(dn[v])delete dn[v];else dn[v]=1;state.settings.shopDone=dn;saveSettings();render();break}
     case'shop-reset':state.settings.shopDone={};saveSettings();render();break;
     case'export':{const t=JSON.stringify(state);const io=$('#io');io.hidden=false;io.value=t;
