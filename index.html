@@ -355,7 +355,7 @@ const MIC_MAX={fib:70,Ca:2500,Fe:45,Mg:null,K:null,vC:2000,Zn:25,o3:5000,D:100};
 const MIC_T={fib:[35,'Fibra','g'],Ca:[1000,'Calcio','mg'],Fe:[8,'Hierro','mg'],Mg:[400,'Magnesio','mg'],K:[3500,'Potasio','mg'],vC:[90,'Vitamina C','mg'],Zn:[11,'Zinc','mg'],o3:[500,'Omega-3 (EPA+DHA)','mg'],D:[15,'Vitamina D','µg']};
 /* Grupos para cambiar un alimento por otro equivalente. La cantidad se ajusta para dar lo mismo del macro clave. */
 const GROUPS={
- prot:{n:'Proteína',key:'P',f:['pollo','ternera','salmon','merluza','atun','sardinas','mejillones','burger','pavof','claras','huevo']},
+ prot:{n:'Proteína',key:'P',f:['pollo','ternera','salmon','merluza','atun','sardinas','burger','pavof','claras','huevo']},
  carb:{n:'Hidratos',key:'C',f:['arroz','pasta','patata','legumbre','lentejas','pan','molde','avena','tortitas','cereales']},
  grasa:{n:'Grasa',key:'F',f:['aceite','aguacate','nueces','cacahuete','queso']},
  lact:{n:'Lácteos y batidos',key:'P',f:['leche','skyr','batido','yogur','whey']},
@@ -363,7 +363,7 @@ const GROUPS={
  veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','judias','salteado','espinacas','verdura']}
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
-const EQ={pollo:'ternera',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'mejillones',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
+const EQ={pollo:'ternera',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'atun',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
  arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',lentejas:'legumbre',pan:'molde',molde:'pan',avena:'cereales',tortitas:'molde',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
  fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
@@ -418,8 +418,7 @@ const OPTS={
   {id:'lentejascena',how:'Lentejas de bote enjuagadas con el salteado congelado, 4 min al microondas, y 1 huevo ya cocido. Queso batido de postre.',n:'Lentejas estofadas con verduras, huevo y queso batido de postre',i:[['lentejas',2,'c'],['huevo',1,'x'],['salteado',1.5,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'pastapollo',how:'Pasta y pollo del tupper con espinacas congeladas, todo 4 min al microondas.',n:'Macarrones con pollo y espinacas',i:[['pollo',1.5,'p'],['pasta',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
   {id:'sardinascena',how:'Una lata de sardinas; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Sardinas con tortilla de claras, patata y ensalada',i:[['sardinas',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
-  {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
-  {id:'mejillones',how:'Una lata de mejillones; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Mejillones con tortilla de claras, patata y ensalada',i:[['mejillones',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]}]
+  {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]}]
 };
 const STRIDE={desayuno:1,comida:3,merienda:1,cena:1,recena:1};
 function blockOf(k){
@@ -429,7 +428,7 @@ function blockOf(k){
 /* Plan simple mediterráneo: desayuno y merienda fijos; comida y cena cambian cada semana (lun-jue / vie-dom) */
 const SIMPLE={desayuno:[['tostadas'],['tostadas']],merienda:[['batido'],['batido']],
   comida:[['currypollo','polloarroz','pavopasta','pavopatata'],['legumbrepollo','lentejasarroz','garbanzos']],
-  cena:[['sardinascena','atunpasta','mejillones'],['pollocena','pastapollo','merluza','burger']]};
+  cena:[['sardinascena','atunpasta'],['pollocena','pastapollo','merluza','burger']]};
 const SIMPLE_FROM='2026-11-09';
 function optFor(k,meal){
   const bl=blockOf(k),list=OPTS[meal],ex=(state.settings.mex||{})[meal]||[];
