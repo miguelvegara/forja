@@ -418,6 +418,7 @@ const OPTS={
   {id:'lentejascena',how:'Lentejas de bote enjuagadas con el salteado congelado, 4 min al microondas, y 1 huevo ya cocido. Queso batido de postre.',n:'Lentejas estofadas con verduras, huevo y queso batido de postre',i:[['lentejas',2,'c'],['huevo',1,'x'],['salteado',1.5,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'pastapollo',how:'Pasta y pollo del tupper con espinacas congeladas, todo 4 min al microondas.',n:'Macarrones con pollo y espinacas',i:[['pollo',1.5,'p'],['pasta',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
   {id:'sardinascena',how:'Una lata de sardinas; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Sardinas con tortilla de claras, patata y ensalada',i:[['sardinas',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
+  {id:'atuncena',how:'Una lata de atún; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Atún con tortilla de claras, patata y ensalada',i:[['atun',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
   {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]}]
 };
 const STRIDE={desayuno:1,comida:3,merienda:1,cena:1,recena:1};
@@ -433,8 +434,8 @@ const SIMPLE_FROM='2026-11-09';
 function optFor(k,meal){
   const bl=blockOf(k),list=OPTS[meal],ex=(state.settings.mex||{})[meal]||[];
   if(state.settings.simple!==false&&k>=SIMPLE_FROM&&SIMPLE[meal]){
-    /* Cena fija: siempre la misma (la que mejor cubre micronutrientes y no necesita carne fresca) */
-    if(meal==='cena'&&state.settings.sameDinner===true){const o=list.find(x=>x.id==='sardinascena');if(o)return o}
+    /* Cena fija: la misma todos los días; solo cambia la lata (sardinas lun-jue, atún vie-dom) para no llegar al tope de purinas ni de mercurio */
+    if(meal==='cena'&&state.settings.sameDinner===true){const o=list.find(x=>x.id===(bl.len===4?'sardinascena':'atuncena'));if(o)return o}
     const ids=SIMPLE[meal][bl.len===4?0:1].filter(id=>!ex.includes(id)),pool=(ids.length?ids:SIMPLE[meal][bl.len===4?0:1]).map(id=>list.find(o=>o.id===id)).filter(Boolean);
     const shift=((state.settings.mswap||{})[bl.key+'|'+meal])||0;
     if(pool.length)return pool[((bl.wn+shift)%pool.length+pool.length)%pool.length]}
