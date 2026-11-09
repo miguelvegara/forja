@@ -360,13 +360,13 @@ const GROUPS={
  grasa:{n:'Grasa',key:'F',f:['aceite','aguacate','nueces','cacahuete','queso']},
  lact:{n:'Lácteos y batidos',key:'P',f:['leche','skyr','batido','yogur','whey']},
  fruta:{n:'Fruta',key:'C',f:['platano','fruta','citrico']},
- veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','judias','salteado','espinacas','verdura']}
+ veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','salteado','espinacas','verdura']}
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
 const EQ={pollo:'ternera',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'atun',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
  arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',lentejas:'legumbre',pan:'molde',molde:'pan',avena:'cereales',tortitas:'molde',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
- fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'judias',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
+ fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'espinacas',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
 function groupOf(f){for(const g in GROUPS)if(GROUPS[g].f.includes(f))return g;return null}
 function subOf(f){const s=(state.settings.subs||{})[f];return s&&F[s]&&groupOf(s)===groupOf(f)?s:null}
 function convQ(from,to,q){const g=GROUPS[groupOf(from)];if(!g)return q;const a=F[from][g.key],b=F[to][g.key];return b>0?q*a/b:q}
@@ -455,15 +455,17 @@ const FREE={comida:{id:'libreC',n:'Comida libre',how:'Lo que haya, en casa o fue
 function menuTpl(k){const m={},names={},fm=state.settings.freeMid===true;mealPlan().forEach(ml=>{const o=fm&&FREE[ml]?FREE[ml]:optFor(k,ml);m[ml]=o.i;names[ml]=o});
   const simp=state.settings.simple!==false&&k>=SIMPLE_FROM;
   if(state.settings.mode==='cut'&&m.cena&&!simp)m.cena=[...m.cena,['batido',.75,'x']];
-  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['judias',1,'x']];
+  if(simp&&m.cena)m.cena=[...m.cena,['yogur',1,'x'],['brocoli',1,'x']];
   /* Sin congelador: la ensalada en bolsa no llega al fin de semana; de viernes a domingo, brócoli congelado */
-  if(simp&&m.cena&&state.settings.noFrz===true&&blockOf(k).len===3)m.cena=m.cena.map(([f,q,r])=>f==='ensalada'?['brocoli',q,r]:[f,q,r]); /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
+  if(simp&&m.cena&&state.settings.noFrz===true&&blockOf(k).len===3)m.cena=m.cena.map(([f,q,r])=>f==='ensalada'?['espinacas',q,r]:[f,q,r]); /* plan simple: siempre 1 yogur de postre y brócoli de guarnición */
   if(state.settings.mode==='cut'&&m.comida&&!fm)m.comida=[...m.comida,['ensalada',1,'x'],...(simp?[]:[['fruta',1,'x']])];
   /* Compra mensual: solo alimentos que aguantan un mes (verdura congelada, fruta de nevera) */
   if((state.settings.shopDays||7)>=14){const alt=(pk(k).getDate()%2)?'judias':'brocoli';
     for(const ml in m){const has=new Set(m[ml].map(x=>x[0]));const pick=['judias','espinacas','brocoli'].find(v=>!has.has(v))||alt;m[ml]=m[ml].map(([f,q,r])=>f==='ensalada'?[pick,q,r]:f==='platano'&&!['platano','mix'].includes(state.settings.fruitPref)?['fruta',q,r]:f==='aguacate'?['nueces',q*11/15,r]:[f,q,r])}} /* al definir: más verdura y fruta, sacian y dan fibra */ /* al definir: postre de skyr para no perder calcio ni proteína sin merienda */
   /* Energía para entrenar: los días de entreno la merienda lleva un plátano más. Las calorías del día no suben: la app recorta hidratos en el resto. */
   if(trainsOn(k)&&m.merienda&&!fm)m.merienda=[...m.merienda,['platano',1,'x']];
+  /* No le gustan las judías verdes: siempre brócoli en su lugar */
+  for(const ml in m){const acc=[];m[ml].forEach(([f,q,r])=>{if(f==='judias')f='brocoli';const e=acc.find(x=>x[0]===f);if(e)e[1]+=q;else acc.push([f,q,r])});m[ml]=acc}
   return{m,names,k}}
 function trainsOn(k){const t=dayType(k);return !!ROUTINE[t]}
 /* Horario del día, calculado desde la hora de entreno */
