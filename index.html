@@ -331,12 +331,14 @@ const F={
  salteado:{n:'Salteado de verduras congelado',u:['puño','puños'],g:100,P:1.5,C:5,F:.3,cat:'fruta'},
  libreC:{n:'Plato libre (regla del plato)',u:['plato','platos'],P:45,C:85,F:28,cat:'fuera'},
  libreM:{n:'Merienda libre',u:['merienda','meriendas'],P:12,C:40,F:8,cat:'fuera'},
- espinacas:{n:'Espinacas congeladas',u:['puño','puños'],g:100,P:2.9,C:1.5,F:.4,cat:'fruta'}
+ espinacas:{n:'Espinacas congeladas',u:['puño','puños'],g:100,P:2.9,C:1.5,F:.4,cat:'fruta'},
+ tomate:{n:'Tomate en rodajas',u:['tomate','tomates'],g:180,P:1.6,C:6,F:.4,cat:'fruta'}
 };
 for(const k in F){const f=F[k]; if(f.k==null) f.k=f.P*4+f.C*4+f.F*9;}
 /* Micronutrientes aproximados por unidad: fibra g, calcio, hierro, magnesio, potasio, vit C, zinc (mg), omega-3 EPA+DHA (mg), vit D (µg) */
 const MIC_KEYS=['fib','Ca','Fe','Mg','K','vC','Zn','o3','D'];
 const MIC_RAW={
+ tomate:[2.2,18,.5,20,430,25,.3,0,0],
  pollo:[0,18,1.2,35,300,0,1.2,30,.1], ternera:[0,15,2.2,30,380,0,4,30,.2], salmon:[0,15,.4,35,480,0,.5,2000,10], merluza:[0,40,.5,40,450,0,.6,300,1.5],
  atun:[0,10,1,25,200,0,.6,200,1.5], huevo:[0,28,.9,6,70,0,.6,35,1.1], claras:[0,14,.2,22,330,0,.1,0,0], burger:[0,15,2.6,22,300,0,5,40,.2],
  jamon:[0,2,.3,3,40,0,.4,0,0], pavof:[0,2,.1,3,50,0,.2,0,0], mejillones:[0,30,4.5,25,220,6,2,450,0], ensalada:[2,40,1.2,20,300,20,.3,0,0], brocoli:[3,45,.7,20,300,80,.4,0,0], judias:[3.4,37,1,25,210,12,.3,0,0], salteado:[2,25,.6,15,250,50,.3,0,0], espinacas:[2.5,100,2.7,80,470,10,.5,0,0], quinoa:[4,25,2.2,95,260,0,1.6,0,0], sardinas:[0,320,2.4,33,340,0,1.1,1200,4],
@@ -360,13 +362,13 @@ const GROUPS={
  grasa:{n:'Grasa',key:'F',f:['aceite','aguacate','nueces','cacahuete','queso']},
  lact:{n:'Lácteos y batidos',key:'P',f:['leche','skyr','batido','yogur','whey']},
  fruta:{n:'Fruta',key:'C',f:['platano','fruta','citrico']},
- veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','salteado','espinacas','verdura']}
+ veg:{n:'Verdura',key:'C',f:['ensalada','brocoli','salteado','espinacas','verdura','tomate']}
 };
 /* Equivalente directo de cada alimento (mismo grupo, misma cantidad del macro clave) */
 const EQ={pollo:'ternera',ternera:'pollo',salmon:'sardinas',merluza:'pollo',atun:'huevo',sardinas:'atun',mejillones:'sardinas',huevo:'claras',claras:'huevo',burger:'pollo',
  arroz:'pasta',pasta:'arroz',patata:'arroz',legumbre:'arroz',lentejas:'legumbre',pan:'molde',molde:'pan',avena:'cereales',tortitas:'molde',cereales:'avena',
  aceite:'aguacate',aguacate:'aceite',nueces:'cacahuete',cacahuete:'nueces',leche:'yogur',skyr:'batido',batido:'yogur',yogur:'batido',
- fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'espinacas',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',verdura:'brocoli'};
+ fruta:'platano',platano:'citrico',citrico:'platano',brocoli:'espinacas',judias:'brocoli',salteado:'espinacas',espinacas:'salteado',ensalada:'brocoli',tomate:'ensalada',verdura:'brocoli'};
 function groupOf(f){for(const g in GROUPS)if(GROUPS[g].f.includes(f))return g;return null}
 function subOf(f){const s=(state.settings.subs||{})[f];return s&&F[s]&&groupOf(s)===groupOf(f)?s:null}
 function convQ(from,to,q){const g=GROUPS[groupOf(from)];if(!g)return q;const a=F[from][g.key],b=F[to][g.key];return b>0?q*a/b:q}
@@ -418,7 +420,7 @@ const OPTS={
   {id:'lentejascena',how:'Lentejas de bote enjuagadas con el salteado congelado, 4 min al microondas, y 1 huevo ya cocido. Queso batido de postre.',n:'Lentejas estofadas con verduras, huevo y queso batido de postre',i:[['lentejas',2,'c'],['huevo',1,'x'],['salteado',1.5,'x'],['aceite',.5,'f'],['batido',0.75,'p']]},
   {id:'pastapollo',how:'Pasta y pollo del tupper con espinacas congeladas, todo 4 min al microondas.',n:'Macarrones con pollo y espinacas',i:[['pollo',1.5,'p'],['pasta',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]},
   {id:'sardinascena',how:'Una lata de sardinas; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Sardinas con tortilla de claras, patata y ensalada',i:[['sardinas',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
-  {id:'pollofijo',how:'Pechuga del tupper (la cocinas el día que la compras: 8-10 min a la plancha), patatas de microondas 8 min y ensalada 4 estaciones.',n:'Pechuga con patata y ensalada',i:[['pollo',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
+  {id:'pollofijo',how:'Pechuga del tupper (la cocinas el día que la compras: 8-10 min a la plancha), patatas de microondas 8 min y un tomate en rodajas con el aceite y sal.',n:'Pechuga con patata y tomate',i:[['pollo',1.5,'p'],['patata',2,'c'],['tomate',1,'x'],['aceite',.5,'f']]},
   {id:'atuncena',how:'Una lata de atún; tortilla de claras (2 min en la sartén); patatas de microondas y ensalada 4 estaciones.',fish:1,n:'Atún con tortilla de claras, patata y ensalada',i:[['atun',1,'x'],['claras',1.5,'p'],['patata',2,'c'],['ensalada',1.5,'x'],['aceite',.5,'f']]},
   {id:'bacalao',how:'Pollo del tupper con garbanzos de bote enjuagados y espinacas congeladas: 4 min al microondas.',fish:1,n:'Garbanzos con pollo y espinacas',i:[['pollo',1,'p'],['legumbre',2,'c'],['espinacas',1.5,'x'],['aceite',.5,'f']]}]
 };
@@ -522,6 +524,7 @@ const SHOP={
  citrico:{s:3,n:'Naranjas',d:'Fruta. Malla o sueltas, las de mesa (no las de zumo).',per:1,pack:1,pu:'pieza',u:'ud'},
  fruta:{s:3,n:'Manzanas',d:'Fruta. Las que más te gusten, sueltas o en bolsa.',per:1,pack:1,pu:'pieza',u:'ud'},
  verdura:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
+ tomate:{s:3,n:'Tomates de ensalada',d:'Fruta y verdura, a granel. Firmes y rojos; la mitad un poco más verdes para que los últimos aguanten hasta el domingo. Guárdalos fuera de la nevera, en el frutero.',per:1,pack:1,pu:'unidad',u:'ud'},
  ensalada:{s:3,n:'Ensalada 4 estaciones + tomates',d:'Fruta y verdura, nevera de bolsas. Bolsa «Ensalada 4 estaciones» y 2 tomates por bolsa. Coge las de fecha más lejana.',per:100,pack:250,pu:'bolsa + 2 tomates',fresh:1},
  brocoli:{s:3,n:'Brócoli congelado',d:'Arcón de congelados, zona de verduras. Bolsa de brócoli en ramilletes.',per:100,pack:1000,pu:'bolsa ~1 kg'},
  judias:{s:3,n:'Judías verdes congeladas',d:'Arcón de congelados, zona de verduras. Bolsa de judías verdes troceadas.',per:100,pack:1000,pu:'bolsa ~1 kg'},
@@ -976,12 +979,13 @@ function buildMenu(tp){
   for(let pass=0;pass<2;pass++){
     const mi=micOf(items.map(i=>[i.f,i.q])),extra=[],meals=[...new Set(items.map(i=>i.m))];
     const snack=meals.includes('merienda')?'merienda':meals.includes('desayuno')?'desayuno':meals[0],dinner=meals.includes('cena')?'cena':meals[meals.length-1];
-    const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca;
+    const sard=mi.o3<200&&pass===0&&(!tp.k||pk(tp.k).getDate()%2===0); /* el calcio de las sardinas cuenta antes de añadir yogur */
+    const fGap=MIC_T.fib[0]*.97-mi.fib,cGap=MIC_T.Ca[0]*.97-mi.Ca-(sard?micOf([['sardinas',1]]).Ca:0);
     const post=meals.includes('cena')?'cena':snack;if(cGap>0)extra.push([post,'yogur',Math.min(3,Math.ceil(cGap/180))]);
     const zGap=MIC_T.Zn[0]*.97-mi.Zn;if(zGap>0)extra.push([snack,'nueces',Math.min(1.5,Math.ceil(zGap/.5)*.5)]);
-    if(mi.o3<200&&pass===0&&(!tp.k||pk(tp.k).getDate()%2===0))extra.push([post,'sardinas',1]); /* lata entera en días alternos */ /* omega-3: media lata de sardinas los días sin pescado azul */
+    if(sard)extra.push([post,'sardinas',1]); /* lata entera en días alternos */ /* omega-3: media lata de sardinas los días sin pescado azul */
     const ban=state.settings.fruitPref==='platano'||state.settings.fruitPref==='mix',vGap=MIC_T.vC[0]*.97-mi.vC;
-    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['judias','espinacas','brocoli'].find(v=>!dv.has(v))||'judias',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fq])}
+    if(ban){const prevFr=(tp._extra||[]).filter(e=>e[1]==='fruta').reduce((s,e)=>s+e[2],0);let bro=0;if(fGap>0)bro=Math.min(2,Math.ceil(fGap/3));if(vGap>0)bro=Math.max(bro,Math.min(2,Math.ceil(vGap/80)));if(pass>0)bro=fGap>0&&prevFr>=2?Math.min(2,Math.ceil(fGap/3)):0;{const VEG=['brocoli','judias','espinacas','ensalada','salteado','tomate'],dq=items.filter(x=>x.m===dinner&&VEG.includes(x.f)).reduce((s,x)=>s+x.q,0);bro=Math.max(0,Math.min(bro,4-dq))}if(bro){const dv=new Set(items.filter(x=>x.m===dinner).map(x=>x.f));extra.push([dinner,['judias','espinacas','brocoli'].find(v=>!dv.has(v))||'judias',bro])}const left=fGap-bro*3,fq=Math.min(2-prevFr,Math.ceil(left/3));if(left>0&&fq>0)extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fq])}
     else if(fGap>0){const fr=Math.min(2,Math.ceil(fGap/3.5));extra.push([meals.includes('merienda')?'merienda':meals.includes('comida')?'comida':snack,'fruta',fr]);if(fGap-fr*3.5>0)extra.push([dinner,'brocoli',Math.min(2,Math.ceil((fGap-fr*3.5)/3))])}
     if(!extra.length)break;
     tp={...tp,_extra:[...(tp._extra||[]),...extra]};items=buildMenuCore(tp);
@@ -1497,7 +1501,7 @@ function vShop(){
       ${x.s.d?`<div class="small muted" style="grid-column:1/-1">${esc(x.s.d)}</div>`:''}
     </div>`};
   const sec2=list2.length?`<section class="card"><div class="eyebrow">Segunda compra · el ${DOWL[pk(add(TODAY,3)).getDay()]}</div>
-    <p class="small muted" style="margin:0 0 4px">La carne fresca y la ensalada en bolsa aguantan 3-4 días. Esto es para los últimos días de la semana: cómpralo el ${DOWL[pk(add(TODAY,3)).getDay()]} y la carne cocínala ese mismo día.</p>${list2.map(item).join('')}</section>`:'';
+    <p class="small muted" style="margin:0 0 4px">${list2.some(x=>/ensalada/i.test(x.s.n))?'La carne fresca y la ensalada en bolsa aguantan':'La carne fresca aguanta'} 3-4 días. Esto es para los últimos días de la semana: cómpralo el ${DOWL[pk(add(TODAY,3)).getDay()]} y la carne cocínala ese mismo día.</p>${list2.map(item).join('')}</section>`:'';
   const secs=SHOP_SECS.map((sec,i)=>{
     const its=list.filter(x=>x.s.s===i);if(!its.length)return'';
     return `<section class="card"><div class="eyebrow">${sec}</div>${its.map(item).join('')}</section>`;
